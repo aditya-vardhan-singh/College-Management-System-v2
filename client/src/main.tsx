@@ -1,10 +1,17 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { NextUIProvider } from "@nextui-org/react";
 import App from "./App.tsx";
-import "@fontsource/inter";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <NextUIProvider>
+      <main className="dark text-foreground bg-background">
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </main>
+    </NextUIProvider>
   </StrictMode>,
 );
