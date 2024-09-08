@@ -3472,11 +3472,6 @@ input[type="range"]::-ms-fill-lower {
   background-color: hsl(var(--nextui-default-500) / var(--nextui-default-500-opacity, var(--tw-bg-opacity)));
 }
 
-.bg-default-900 {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--nextui-default-900) / var(--nextui-default-900-opacity, var(--tw-bg-opacity)));
-}
-
 .bg-default\/40 {
   background-color: hsl(var(--nextui-default) / 0.4);
 }
@@ -5805,6 +5800,10 @@ input[type="range"]::-ms-fill-lower {
 
 .\[scrollbar-width\:none\] {
   scrollbar-width: none;
+}
+
+.dark {
+  color: #ffffff;
 }
 
 .file\:cursor-pointer::file-selector-button {

@@ -1,35 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { Toaster, toast } from "sonner";
 import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Input,
   Button,
-  DropdownTrigger,
   Dropdown,
-  DropdownMenu,
   DropdownItem,
-  Chip,
-  User,
-  Pagination,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
   Modal,
-  ModalContent,
-  ModalHeader,
   ModalBody,
+  ModalContent,
   ModalFooter,
+  ModalHeader,
+  Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   useDisclosure,
 } from "@nextui-org/react";
-import { PlusIcon } from "../assets/PlusIcon";
-import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
-import { SearchIcon } from "../assets/SearchIcon";
+import React, { useEffect, useState } from "react";
+import { Toaster, toast } from "sonner";
 import { ChevronDownIcon } from "../assets/ChevronDownIcon";
-// import { columns, users, statusOptions } from "../data/StudentTableData";
-import { baseUrl, capitalize } from "../data/utils";
+import { PlusIcon } from "../assets/PlusIcon";
+import { SearchIcon } from "../assets/SearchIcon";
+import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
 import axios from "axios";
+import { baseUrl, capitalize } from "../data/utils";
+import StudentForm from "./StudentForm";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
@@ -52,11 +50,11 @@ const statusOptions = [
   { name: "Left", uid: "left" },
 ];
 
-const statusColorMap = {
-  admitted: "success",
-  left: "danger",
-  pending: "warning",
-};
+// const statusColorMap = {
+//   admitted: "success",
+//   left: "danger",
+//   pending: "warning",
+// };
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
@@ -244,7 +242,7 @@ export default function StudentTable() {
     }
 
     return filteredUsers;
-  }, [users, filterValue, statusFilter]);
+  }, [users, filterValue, statusFilter, hasSearchFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -266,9 +264,8 @@ export default function StudentTable() {
   }, [sortDescriptor, items]);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { isOpenEdit, onOpenEdit, onOpenChangeEdit } = useDisclosure();
-  const { isOpenDelete, onOpenDelete, onOpenChangeDelete } = useDisclosure();
   const [currentUser, setCurrentUser] = useState(users[0]);
+  const [currentOption, setCurrentOption] = useState<string>("");
 
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
@@ -309,14 +306,40 @@ export default function StudentTable() {
           <div className="relative flex justify-end items-center gap-2">
             <Dropdown>
               <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  onClick={() => setCurrentUser(user)}
+                >
                   <VerticalDotsIcon className="text-default-300" />
                 </Button>
               </DropdownTrigger>
-              <DropdownMenu onClick={() => setCurrentUser(user)}>
-                <DropdownItem onPress={onOpen}>View</DropdownItem>
-                <DropdownItem onPress={onOpenEdit}>Edit</DropdownItem>
-                <DropdownItem onPress={onOpenDelete}>Delete</DropdownItem>
+              <DropdownMenu>
+                <DropdownItem
+                  onClick={() => {
+                    setCurrentOption("View");
+                    onOpen();
+                  }}
+                >
+                  View
+                </DropdownItem>
+                <DropdownItem
+                  onClick={() => {
+                    setCurrentOption("Edit");
+                    onOpen();
+                  }}
+                >
+                  Edit
+                </DropdownItem>
+                <DropdownItem
+                  onClick={() => {
+                    setCurrentOption("Delete");
+                    onOpen();
+                  }}
+                >
+                  Delete
+                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -364,7 +387,7 @@ export default function StudentTable() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            style={{ borderWidth: 0 }}
+            style={{ borderWidth: 0, boxShadow: "none" }}
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
@@ -433,11 +456,13 @@ export default function StudentTable() {
             Rows per page:
             <select
               className="bg-transparent outline-none text-default-400 text-small border-0"
+              style={{ boxShadow: "none" }}
               onChange={onRowsPerPageChange}
             >
               <option value="5">5</option>
               <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="40">40</option>
+              <option value="70">70</option>
             </select>
           </label>
         </div>
@@ -492,29 +517,118 @@ export default function StudentTable() {
     );
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
-  const StudentModal = ({ isOpen, onClose, user }) => {
+  const StudentModal = ({ isOpen, onClose }) => {
     return (
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onClose}
-        className="bg-default-900 text-white"
-      >
-        <ModalContent>
-          <ModalHeader>
-            {user ? `${user.first_name} ${user.last_name}` : "No User Selected"}
-          </ModalHeader>
-          <ModalBody>
-            <p>Email: {user?.email}</p>
-            <p>Phone: {user?.phone}</p>
-            <p>Address: {user?.address}</p>
-            <p>Department ID: {user?.department_id}</p>
-            <p>Status: {user?.status}</p>
-          </ModalBody>
-          <ModalFooter>
-            <Button onPress={onClose}>Close</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <>
+        {currentOption === "View" && (
+          <Modal
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            backdrop="blur"
+            size="2xl"
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">
+                    {`${currentUser.first_name} ${currentUser.last_name}`}
+                  </ModalHeader>
+                  <ModalBody>
+                    <p>
+                      ID: {currentUser.id}
+                      <br />
+                      AGE: {currentUser.age}
+                      <br />
+                      GENDER: {currentUser.gender}
+                      <br />
+                      EMAIL: {currentUser.email}
+                      <br />
+                      PHONE: {currentUser.phone}
+                      <br />
+                      ADDRESS: {currentUser.address}
+                      <br />
+                      DEPARTMENT ID: {currentUser.department_id}
+                      <br />
+                      ENROLLMENT DATE: {currentUser.enrollment_date}
+                      <br />
+                      STATUS: {currentUser.status}
+                    </p>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                    {/* <Button color="primary" onPress={onClose}>
+                      Action
+                    </Button> */}
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
+        )}
+        {currentOption === "Delete" && (
+          <Modal
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            backdrop="blur"
+            size="2xl"
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">
+                    Confirmation
+                  </ModalHeader>
+                  <ModalBody>
+                    <p>
+                      Are you sure you want to remove{" "}
+                      {`${currentUser.first_name} ${currentUser.last_name}`}
+                    </p>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                    <Button color="primary" onPress={onClose}>
+                      Delete
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
+        )}
+        {currentOption === "Edit" && (
+          <Modal
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            backdrop="blur"
+            size="5xl"
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">
+                    Edit Student
+                  </ModalHeader>
+                  <ModalBody>
+                    <StudentForm />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                    <Button color="primary" onPress={onClose}>
+                      Update
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
+        )}
+      </>
     );
   };
 
@@ -573,53 +687,12 @@ export default function StudentTable() {
           )}
         </TableBody>
       </Table>
-      {/* <StudentModal isOpen={isOpen} onClose={onOpenChange} user={currentUser} /> */}
-      <Modal
+      <StudentModal
         isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        backdrop="blur"
-        size="2xl"
-        className="bg-black text-white"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                {`${currentUser.first_name} ${currentUser.last_name}`}
-              </ModalHeader>
-              <ModalBody>
-                <p>
-                  ID: {currentUser.id}
-                  <br />
-                  AGE: {currentUser.age}
-                  <br />
-                  GENDER: {currentUser.gender}
-                  <br />
-                  EMAIL: {currentUser.email}
-                  <br />
-                  PHONE: {currentUser.phone}
-                  <br />
-                  ADDRESS: {currentUser.address}
-                  <br />
-                  DEPARTMENT ID: {currentUser.department_id}
-                  <br />
-                  ENROLLMENT DATE: {currentUser.enrollment_date}
-                  <br />
-                  STATUS: {currentUser.status}
-                </p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={onClose}>
-                  Action
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        onClose={onOpenChange}
+        user={currentUser}
+        option={currentOption}
+      />
     </>
   );
 }
