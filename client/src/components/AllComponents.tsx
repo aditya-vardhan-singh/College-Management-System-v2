@@ -4,6 +4,8 @@ import FacultyTable from "./FacultyTable";
 import ExamTable from "./ExamTable";
 import ClassTable from "./ClassTable";
 import CourseTable from "./CourseTable";
+import ResultTable from "./ResultTable";
+import AttendanceTable from "./AttendanceTable";
 import Footer from "./Footer";
 import Card1 from "./Card1";
 
@@ -14,6 +16,8 @@ export {
   ExamTable,
   ClassTable,
   CourseTable,
+  ResultTable,
+  AttendanceTable,
   Card1,
   Footer,
 };

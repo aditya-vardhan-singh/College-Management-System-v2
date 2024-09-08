@@ -1311,10 +1311,6 @@ input[type="range"]::-ms-fill-lower {
   margin: 1rem;
 }
 
-.m-8 {
-  margin: 2rem;
-}
-
 .-mx-1 {
   margin-left: -0.25rem;
   margin-right: -0.25rem;
@@ -1408,11 +1404,6 @@ input[type="range"]::-ms-fill-lower {
 .my-auto {
   margin-top: auto;
   margin-bottom: auto;
-}
-
-.mx-8 {
-  margin-left: 2rem;
-  margin-right: 2rem;
 }
 
 .-mb-px {
@@ -3365,6 +3356,11 @@ input[type="range"]::-ms-fill-lower {
   background-color: hsl(var(--nextui-background) / 0.8);
 }
 
+.bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
 .bg-black\/20 {
   background-color: rgb(0 0 0 / 0.2);
 }
@@ -3474,6 +3470,11 @@ input[type="range"]::-ms-fill-lower {
 .bg-default-500 {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--nextui-default-500) / var(--nextui-default-500-opacity, var(--tw-bg-opacity)));
+}
+
+.bg-default-900 {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--nextui-default-900) / var(--nextui-default-900-opacity, var(--tw-bg-opacity)));
 }
 
 .bg-default\/40 {

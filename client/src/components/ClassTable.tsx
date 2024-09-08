@@ -197,6 +197,7 @@ export default function ClassTable() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
+            style={{ borderWidth: 0 }}
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
@@ -264,7 +265,7 @@ export default function ClassTable() {
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
-              className="bg-transparent outline-none text-default-400 text-small"
+              className="bg-transparent outline-none text-default-400 text-small border-0"
               onChange={onRowsPerPageChange}
             >
               <option value="5">5</option>

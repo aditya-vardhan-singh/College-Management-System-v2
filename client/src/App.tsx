@@ -1,14 +1,6 @@
-import { Routes, Route } from "react-router-dom";
-import {
-  Dashboard,
-  Student,
-  Faculty,
-  Class,
-  Exam,
-  Course,
-} from "./pages/AllPages.tsx";
-import { NavigationBar, Footer } from "./components/AllComponents.tsx";
 import { useState } from "react";
+import { NavigationBar, Footer } from "./components/AllComponents.tsx";
+import Router from "./pages/Router.tsx";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("");
@@ -18,32 +10,7 @@ export default function App() {
         <div>
           <NavigationBar currentPage={currentPage} />
           <div className="mx-5 my-8">
-            <Routes>
-              <Route
-                path="/"
-                element={<Dashboard setCurrentPage={setCurrentPage} />}
-              />
-              <Route
-                path="/student"
-                element={<Student setCurrentPage={setCurrentPage} />}
-              />
-              <Route
-                path="/faculty"
-                element={<Faculty setCurrentPage={setCurrentPage} />}
-              />
-              <Route
-                path="/class"
-                element={<Class setCurrentPage={setCurrentPage} />}
-              />
-              <Route
-                path="/exam"
-                element={<Exam setCurrentPage={setCurrentPage} />}
-              />
-              <Route
-                path="/course"
-                element={<Course setCurrentPage={setCurrentPage} />}
-              />
-            </Routes>
+            <Router setCurrentPage={setCurrentPage} />
           </div>
         </div>
         <Footer />

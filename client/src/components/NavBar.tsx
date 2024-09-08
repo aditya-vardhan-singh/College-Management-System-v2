@@ -24,8 +24,8 @@ export default function NavigationBar({
     { name: "Faculty", href: "/faculty" },
     { name: "Exam", href: "/exam" },
     { name: "Course", href: "/course" },
-    { name: "Result", href: "#" },
-    { name: "Attendance", href: "#" },
+    { name: "Result", href: "/result" },
+    { name: "Attendance", href: "/attendance" },
   ];
 
   const navBarItems = menuItems.map((item, index) => {
@@ -105,10 +105,10 @@ export default function NavigationBar({
                     : "foreground"
               }
               className="w-full"
-              href="#"
+              href={item.href}
               size="lg"
             >
-              {item}
+              {item.name}
             </Link>
           </NavbarMenuItem>
         ))}
