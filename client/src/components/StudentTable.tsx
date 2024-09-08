@@ -1,5 +1,6 @@
 import {
   Button,
+  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -34,11 +35,13 @@ const columns = [
   { name: "FIRST NAME", uid: "first_name", sortable: true },
   { name: "LAST NAME", uid: "last_name", sortable: true },
   { name: "AGE", uid: "age", sortable: true },
+  { name: "DATE OF BIRTH", uid: "date_of_birth", sortable: true },
   { name: "GENDER", uid: "gender", sortable: true },
   { name: "EMAIL", uid: "email" },
   { name: "PHONE", uid: "phone" },
   { name: "ADDRESS", uid: "address" },
   { name: "DEPARTMENT ID", uid: "department_id", sortable: true },
+  { name: "DEPARTMENT", uid: "department", sortable: true },
   { name: "ENROLLMENT DATE", uid: "enrollment_date", sortable: true },
   { name: "STATUS", uid: "status", sortable: true },
   { name: "ACTIONS", uid: "actions" },
@@ -50,11 +53,11 @@ const statusOptions = [
   { name: "Left", uid: "left" },
 ];
 
-// const statusColorMap = {
-//   admitted: "success",
-//   left: "danger",
-//   pending: "warning",
-// };
+const statusColorMap = {
+  admitted: "success",
+  left: "danger",
+  pending: "warning",
+};
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
@@ -63,6 +66,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "age",
   "email",
   "gender",
+  "status",
   "actions",
 ];
 
@@ -73,11 +77,13 @@ export default function StudentTable() {
       first_name: "Tony",
       last_name: "Reichert",
       age: "29",
+      date_of_birth: "2002-11-09",
       gender: "Male",
       email: "tony.reichert@example.com",
       phone: "8528736532",
       address: "Springfield, MO, United States",
       department_id: "9",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-09-01",
       status: "pending",
     },
@@ -86,11 +92,13 @@ export default function StudentTable() {
       first_name: "Sarah",
       last_name: "Connor",
       age: "34",
+      date_of_birth: "2002-11-09",
       gender: "Female",
       email: "sarah.connor@example.com",
       phone: "6317283564",
       address: "Los Angeles, CA, United States",
       department_id: "5",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-08-15",
       status: "admitted",
     },
@@ -99,11 +107,13 @@ export default function StudentTable() {
       first_name: "Michael",
       last_name: "Johnson",
       age: "24",
+      date_of_birth: "2002-11-08",
       gender: "Male",
       email: "michael.johnson@example.com",
       phone: "7218456321",
       address: "New York, NY, United States",
       department_id: "7",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-07-20",
       status: "left",
     },
@@ -112,11 +122,13 @@ export default function StudentTable() {
       first_name: "Emily",
       last_name: "Smith",
       age: "27",
+      date_of_birth: "2002-11-08",
       gender: "Female",
       email: "emily.smith@example.com",
       phone: "3217648123",
       address: "Chicago, IL, United States",
       department_id: "3",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-06-10",
       status: "admitted",
     },
@@ -125,11 +137,13 @@ export default function StudentTable() {
       first_name: "David",
       last_name: "Lee",
       age: "31",
+      date_of_birth: "2002-11-08",
       gender: "Male",
       email: "david.lee@example.com",
       phone: "4357894321",
       address: "Houston, TX, United States",
       department_id: "4",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-09-03",
       status: "pending",
     },
@@ -138,11 +152,13 @@ export default function StudentTable() {
       first_name: "Jessica",
       last_name: "Brown",
       age: "26",
+      date_of_birth: "2002-11-08",
       gender: "Female",
       email: "jessica.brown@example.com",
       phone: "9457845632",
       address: "Phoenix, AZ, United States",
       department_id: "6",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-05-22",
       status: "admitted",
     },
@@ -151,11 +167,13 @@ export default function StudentTable() {
       first_name: "Robert",
       last_name: "Miller",
       age: "28",
+      date_of_birth: "2002-11-08",
       gender: "Male",
       email: "robert.miller@example.com",
       phone: "5893216548",
       address: "San Francisco, CA, United States",
       department_id: "2",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-07-11",
       status: "vacation",
     },
@@ -164,11 +182,13 @@ export default function StudentTable() {
       first_name: "Laura",
       last_name: "Williams",
       age: "30",
+      date_of_birth: "2002-11-08",
       gender: "Female",
       email: "laura.williams@example.com",
       phone: "6321549876",
       address: "Miami, FL, United States",
       department_id: "8",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-08-25",
       status: "admitted",
     },
@@ -177,11 +197,13 @@ export default function StudentTable() {
       first_name: "Daniel",
       last_name: "Taylor",
       age: "35",
+      date_of_birth: "2002-11-08",
       gender: "Male",
       email: "daniel.taylor@example.com",
       phone: "7813265432",
       address: "Seattle, WA, United States",
       department_id: "1",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-07-01",
       status: "left",
     },
@@ -190,11 +212,13 @@ export default function StudentTable() {
       first_name: "Sophia",
       last_name: "Davis",
       age: "29",
+      date_of_birth: "2002-11-08",
       gender: "Female",
       email: "sophia.davis@example.com",
       phone: "9658741235",
       address: "Boston, MA, United States",
       department_id: "10",
+      department: "Computer Science & Engineering",
       enrollment_date: "2024-06-18",
       status: "admitted",
     },
@@ -290,17 +314,17 @@ export default function StudentTable() {
       //       </p>
       //     </div>
       //   );
-      // case "status":
-      //   return (
-      //     <Chip
-      //       className="capitalize"
-      //       color={statusColorMap[user.status]}
-      //       size="sm"
-      //       variant="flat"
-      //     >
-      //       {cellValue}
-      //     </Chip>
-      //   );
+      case "status":
+        return (
+          <Chip
+            className="capitalize"
+            color={statusColorMap[user.status]}
+            size="sm"
+            variant="flat"
+          >
+            {cellValue}
+          </Chip>
+        );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
@@ -443,7 +467,14 @@ export default function StudentTable() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
+            <Button
+              color="primary"
+              endContent={<PlusIcon />}
+              onClick={() => {
+                setCurrentOption("Add");
+                onOpen();
+              }}
+            >
               Add New
             </Button>
           </div>
@@ -482,9 +513,11 @@ export default function StudentTable() {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
+          {/* {selectedKeys === "all"
             ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+            : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
+          {filteredItems.length !== users.length &&
+            `Total ${filteredItems.length} students found in search`}
         </span>
         <Pagination
           isCompact
@@ -613,7 +646,7 @@ export default function StudentTable() {
                     Edit Student
                   </ModalHeader>
                   <ModalBody>
-                    <StudentForm />
+                    <StudentForm student={currentUser} />
                   </ModalBody>
                   <ModalFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
@@ -621,6 +654,51 @@ export default function StudentTable() {
                     </Button>
                     <Button color="primary" onPress={onClose}>
                       Update
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
+        )}
+        {currentOption === "Add" && (
+          <Modal
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            backdrop="blur"
+            size="5xl"
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">
+                    Add New Student
+                  </ModalHeader>
+                  <ModalBody>
+                    <StudentForm
+                      student={{
+                        id: "",
+                        primary_key: "",
+                        first_name: "",
+                        last_name: "",
+                        gender: "",
+                        email: "",
+                        phone: "",
+                        age: "",
+                        date_of_birth: "",
+                        address: "",
+                        department_id: "",
+                        department: "",
+                        enrollment_date: "",
+                      }}
+                    />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                    <Button color="primary" onPress={onClose}>
+                      Add
                     </Button>
                   </ModalFooter>
                 </>
@@ -649,7 +727,7 @@ export default function StudentTable() {
 
   return (
     <>
-      <Toaster richColors position="bottom-right" />
+      <Toaster richColors position="bottom-center" />
       <Table
         aria-label="Example table with custom cells, pagination and sorting"
         isHeaderSticky
