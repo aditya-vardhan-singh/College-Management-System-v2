@@ -4,7 +4,7 @@ from flask import Flask
 from flask_cors import CORS
 
 
-### APP | CORS ###
+### APP | CORS SETUP ###
 
 app = Flask(__name__)
 CORS(app)
@@ -12,11 +12,11 @@ CORS(app)
 
 ### ROUTING ###
 
-from routes import student_routes, teacher_routes, subject_routes
+from routes import student_routes
+from routes import department_routes
 
 app.register_blueprint(student_routes.bp)
-app.register_blueprint(teacher_routes.bp)
-app.register_blueprint(subject_routes.bp)
+app.register_blueprint(department_routes.bp)
 
 
 ### START SERVER ###

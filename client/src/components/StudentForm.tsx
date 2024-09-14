@@ -1,165 +1,314 @@
-import { Input, Select, SelectItem } from "@nextui-org/react";
+/* Imports */
+import {
+  Input,
+  Select,
+  SelectItem,
+  ModalFooter,
+  ModalBody,
+  Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+} from "@nextui-org/react";
+import { Toaster, toast } from "sonner";
+import axios, { isAxiosError } from "axios";
+import { useEffect, useState } from "react";
+import { baseUrl } from "../data/utils";
 
-interface Student {
-  id: string;
-  primary_key: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  age: string;
-  date_of_birth: string;
-  gender: string;
-  address: string;
-  department_id: string;
-  department: string;
-  enrollment_date: string;
+/* Typehints */
+import { StudentType } from "./StudentTable";
+
+interface Department {
+  key: string;
+  label: string;
 }
 
-export default function StudentForm({ student }: { student: Student }) {
+interface StudentFormProps {
+  //   student: StudentType;
+  //   setStudent: Dispatch<SetStateAction<StudentType>>;
+  // handleAddStudentSubmit: Function;
+  isOpen: Function;
+  onClose: Function;
+  onOpenChange: Function;
+}
+
+export default function StudentForm({
+  // student,
+  // setStudent,
+  isOpen,
+  onClose,
+  onOpenChange,
+}: StudentFormProps) {
+  // Genders list
   const genders = [
     { key: "Male", label: "Male" },
     { key: "Female", label: "Female" },
   ];
-  const departments = [
-    { key: "1", label: "Computer Science & Engineering" },
-    { key: "2", label: "Mechanical Engineering" },
-    { key: "3", label: "Civil Engineering" },
-    { key: "4", label: "Electrical Engineering" },
-    { key: "5", label: "Electronics & Communication Engineering" },
-  ];
+
+  // Departments list
+  const [departments, setDepartments] = useState<Department[]>([
+    {
+      key: "",
+      label: "",
+    },
+  ]);
+
+  // Fetch departments from database
+  const fetchDepartments = async () => {
+    try {
+      const response: { data: { departments: Department[] } } = await axios.get(
+        baseUrl + "/departments/get-all",
+      );
+      if (response?.data?.departments) {
+        setDepartments(response.data.departments);
+      }
+    } catch (err: { response: { data: { message: string } } }) {
+      if (axios.isAxiosError(err)) {
+        toast.error(
+          err?.response?.data?.message || "Unable to get departments list!",
+        );
+      } else {
+        toast.error("An unexptected error occured. Please try again later.");
+      }
+    }
+  };
+
+  const [student, setStudent] = useState<StudentType>({
+    id: "",
+    primary_key: "",
+    first_name: "",
+    last_name: "",
+    gender: "Male",
+    email: "",
+    phone: "",
+    age: "",
+    date_of_birth: "",
+    address: "",
+    department_id: "",
+    department: "",
+    enrollment_date: "",
+    status: "pending",
+  });
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const handleAddStudentSubmit = async () => {
+    if (
+      !student.first_name === "" ||
+      !student.last_name === "" ||
+      !student.gender === "" ||
+      !student.date_of_birth === "" ||
+      !student.department === "" ||
+      !student.enrollment_date === ""
+    ) {
+      toast.warning("Please enter all the required fields");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${baseUrl}/students/add`, {
+        student: student,
+      });
+      toast.success(
+        response?.data?.message || "New student added successfully.",
+      );
+    } catch (err) {
+      if (isAxiosError(err)) {
+        toast.error(err?.response?.data?.message || "Error adding new student");
+      } else {
+        toast.error("An unexpected error occured. Please try later.");
+      }
+    }
+
+    onClose();
+  };
 
   return (
-    <form>
-      <div className="grid grid-cols-6 gap-4">
-        <div className="col-span-6">
-          {student.id !== "" && (
-            <Input
-              name="id"
-              isReadOnly
-              type="none"
-              label="Student ID"
-              labelPlacement="inside"
-              defaultValue={student.id}
-              style={{ borderWidth: 0, boxShadow: "none" }}
-            />
+    <>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        backdrop="blur"
+        size="5xl"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Add New Student
+              </ModalHeader>
+              <ModalBody>
+                <form>
+                  <Toaster richColors position="bottom-center" />
+                  <div className="grid grid-cols-6 gap-4">
+                    <div className="col-span-6">
+                      {student.id !== "" && (
+                        <Input
+                          name="id"
+                          isReadOnly
+                          type="none"
+                          label="Student ID"
+                          labelPlacement="inside"
+                          defaultValue={student.id}
+                          style={{ borderWidth: 0, boxShadow: "none" }}
+                        />
+                      )}
+                    </div>
+                    <Input
+                      className="col-span-3"
+                      isRequired
+                      type="none"
+                      maxLength={50}
+                      autoComplete="first_name"
+                      label="First Name"
+                      labelPlacement="inside"
+                      defaultValue={student.first_name}
+                      onChange={(e) =>
+                        setStudent((prev: StudentType) => {
+                          return { ...prev, first_name: e.target.value };
+                        })
+                      }
+                      style={{ borderWidth: 0, boxShadow: "none" }}
+                    />
+                    <Input
+                      className="col-span-3"
+                      isRequired
+                      type="none"
+                      maxLength={50}
+                      autoComplete="last_name"
+                      label="Last Name"
+                      labelPlacement="inside"
+                      defaultValue={student.last_name}
+                      onChange={(e) =>
+                        setStudent((prev: StudentType) => {
+                          return { ...prev, last_name: e.target.value };
+                        })
+                      }
+                      style={{ borderWidth: 0, boxShadow: "none" }}
+                    />
+                    <Select
+                      isRequired
+                      label="Gender"
+                      className="max-w-xs col-span-2"
+                      defaultSelectedKeys={[student.gender]}
+                    >
+                      {genders.map((gender) => (
+                        <SelectItem key={gender.key}>{gender.label}</SelectItem>
+                      ))}
+                    </Select>
+                    <Input
+                      className="col-span-2"
+                      isRequired
+                      isClearable
+                      type="email"
+                      maxLength={100}
+                      autoComplete="email"
+                      label="Email"
+                      labelPlacement="inside"
+                      defaultValue={student.email}
+                      onChange={(e) =>
+                        setStudent((prev: StudentType) => {
+                          return { ...prev, email: e.target.value };
+                        })
+                      }
+                      style={{ borderWidth: 0, boxShadow: "none" }}
+                    />
+                    <Input
+                      className="col-span-2"
+                      type="number"
+                      maxLength={15}
+                      autoComplete="phone"
+                      label="Phone"
+                      defaultValue={student.phone}
+                      onChange={(e) =>
+                        setStudent((prev: StudentType) => {
+                          return { ...prev, phone: e.target.value };
+                        })
+                      }
+                      labelPlacement="inside"
+                      style={{ borderWidth: 0, boxShadow: "none" }}
+                    />
+                    <Input
+                      className="col-span-2"
+                      isRequired
+                      type="date"
+                      label="Date of Birth"
+                      defaultValue={student.date_of_birth}
+                      onChange={(e) =>
+                        setStudent((prev: StudentType) => {
+                          return { ...prev, date_of_birth: e.target.value };
+                        })
+                      }
+                      labelPlacement="inside"
+                      style={{ borderWidth: 0, boxShadow: "none" }}
+                    />
+                    <Select
+                      isRequired
+                      label="Department"
+                      className="max-w-xs col-span-2"
+                      defaultSelectedKeys={[student.department_id]}
+                      onChange={(e) =>
+                        setStudent((prev: StudentType) => {
+                          return { ...prev, department_id: e.target.value };
+                        })
+                      }
+                    >
+                      {departments.map((department) => (
+                        <SelectItem key={department.key}>
+                          {department.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                    <Input
+                      className="col-span-2"
+                      isRequired
+                      type="date"
+                      label="Enrollment Date"
+                      defaultValue={student.enrollment_date}
+                      onChange={(e) =>
+                        setStudent((prev: StudentType) => {
+                          return { ...prev, enrollment_date: e.target.value };
+                        })
+                      }
+                      labelPlacement="inside"
+                      style={{ borderWidth: 0, boxShadow: "none" }}
+                    />
+                    <Input
+                      className="col-span-6"
+                      type="none"
+                      maxLength={500}
+                      label="Address"
+                      defaultValue={student.address}
+                      onChange={(e) =>
+                        setStudent((prev: StudentType) => {
+                          return { ...prev, address: e.target.value };
+                        })
+                      }
+                      labelPlacement="inside"
+                      style={{ borderWidth: 0, boxShadow: "none" }}
+                    />
+                  </div>
+                </form>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button
+                  color="primary"
+                  onClick={() => {
+                    handleAddStudentSubmit();
+                  }}
+                >
+                  Add
+                </Button>
+              </ModalFooter>
+            </>
           )}
-        </div>
-        <Input
-          className="col-span-3"
-          isRequired
-          type="none"
-          maxLength={50}
-          autoComplete="first_name"
-          label="First Name"
-          labelPlacement="inside"
-          defaultValue={student.first_name}
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        />
-        <Input
-          className="col-span-3"
-          isRequired
-          type="none"
-          maxLength={50}
-          autoComplete="last_name"
-          label="Last Name"
-          labelPlacement="inside"
-          defaultValue={student.last_name}
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        />
-        <Select
-          isRequired
-          label="Gender"
-          className="max-w-xs col-span-2"
-          defaultSelectedKeys={[student.gender]}
-        >
-          {genders.map((gender) => (
-            <SelectItem key={gender.key}>{gender.label}</SelectItem>
-          ))}
-        </Select>
-        <Input
-          className="col-span-2"
-          isRequired
-          isClearable
-          type="email"
-          maxLength={100}
-          autoComplete="email"
-          label="Email"
-          labelPlacement="inside"
-          // description="We'll never share your email with anyone else."
-          defaultValue={student.email}
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        />
-        <Input
-          className="col-span-2"
-          type="number"
-          maxLength={15}
-          autoComplete="phone"
-          label="Phone"
-          defaultValue={student.phone}
-          labelPlacement="inside"
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        />
-
-        {/* <Input
-          className="col-span-2"
-          isRequired={student.age === ""}
-          isReadOnly={student.age !== ""}
-          type="number"
-          label="Age"
-          defaultValue={student.age}
-          labelPlacement="inside"
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        /> */}
-        <Input
-          className="col-span-2"
-          isRequired
-          // isRequired={student.date_of_birth === ""}
-          // isReadOnly={student.date_of_birth !== ""}
-          type="date"
-          label="Date of Birth"
-          defaultValue={student.date_of_birth}
-          labelPlacement="inside"
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        />
-        {/* <Input
-          className="col-span-2"
-          isRequired
-          type="none"
-          label="Department"
-          defaultValue={student.department_id}
-          labelPlacement="inside"
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        /> */}
-        <Select
-          isRequired
-          label="Department"
-          className="max-w-xs col-span-2"
-          defaultSelectedKeys={[student.department_id]}
-        >
-          {departments.map((department) => (
-            <SelectItem key={department.key}>{department.label}</SelectItem>
-          ))}
-        </Select>
-        <Input
-          className="col-span-2"
-          isRequired
-          type="date"
-          label="Enrollment Date"
-          defaultValue={student.enrollment_date}
-          labelPlacement="inside"
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        />
-        <Input
-          className="col-span-6"
-          type="none"
-          maxLength={500}
-          label="Address"
-          defaultValue={student.address}
-          labelPlacement="inside"
-          style={{ borderWidth: 0, boxShadow: "none" }}
-        />
-      </div>
-    </form>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

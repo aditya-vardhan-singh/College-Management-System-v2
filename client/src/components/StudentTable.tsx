@@ -30,6 +30,23 @@ import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
 import StudentForm from "./StudentForm";
 
+export interface StudentType {
+  id: string;
+  primary_key: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  age: string;
+  date_of_birth: string;
+  gender: "Male" | "Female";
+  address: string;
+  department_id: string;
+  department: string;
+  enrollment_date: string;
+  status: "pending" | "admitted" | "left";
+}
+
 const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FIRST NAME", uid: "first_name", sortable: true },
@@ -71,6 +88,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 export default function StudentTable() {
+  // All students
   const [users, setUsers] = React.useState([
     {
       id: 1,
@@ -550,6 +568,23 @@ export default function StudentTable() {
     );
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
+  // const [student, setStudent] = useState<StudentType>({
+  //   id: "",
+  //   primary_key: "",
+  //   first_name: "",
+  //   last_name: "",
+  //   gender: "Male",
+  //   email: "",
+  //   phone: "",
+  //   age: "",
+  //   date_of_birth: "",
+  //   address: "",
+  //   department_id: "",
+  //   department: "",
+  //   enrollment_date: "",
+  //   status: "pending",
+  // });
+
   const StudentModal = ({ isOpen, onClose }) => {
     return (
       <>
@@ -662,49 +697,11 @@ export default function StudentTable() {
           </Modal>
         )}
         {currentOption === "Add" && (
-          <Modal
+          <StudentForm
             isOpen={isOpen}
+            onClose={onClose}
             onOpenChange={onOpenChange}
-            backdrop="blur"
-            size="5xl"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Add New Student
-                  </ModalHeader>
-                  <ModalBody>
-                    <StudentForm
-                      student={{
-                        id: "",
-                        primary_key: "",
-                        first_name: "",
-                        last_name: "",
-                        gender: "",
-                        email: "",
-                        phone: "",
-                        age: "",
-                        date_of_birth: "",
-                        address: "",
-                        department_id: "",
-                        department: "",
-                        enrollment_date: "",
-                      }}
-                    />
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                      Add
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
+          />
         )}
       </>
     );
@@ -712,7 +709,7 @@ export default function StudentTable() {
 
   useEffect(() => {
     axios
-      .get(`${baseUrl}/student/get`)
+      .get(`${baseUrl}/students/all`)
       .then((response) => {
         if (response?.data?.users) {
           setUsers(response.data.users);
@@ -721,7 +718,10 @@ export default function StudentTable() {
         }
       })
       .catch((err) => {
-        toast.error(err?.message || "Error getting student records!");
+        console.log(err);
+        toast.error(
+          err?.response?.data?.message || "Error getting student records!",
+        );
       });
   }, []);
 

@@ -1,8 +1,8 @@
+import datetime
 from sqlalchemy import Column, Integer, String, Date, Text, ForeignKey, CheckConstraint, Time
-from sqlalchemy.orm import relationship, declarative_base, Mapped, mapped_column
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql.sqltypes import Boolean
-
-Base = declarative_base()
+from schema.utils import Base, Session, engine
 
 
 # 1. Students Table
@@ -19,7 +19,8 @@ class Student(Base):
     address: Mapped[Text] = mapped_column(Text, nullable=True)
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.department_id'))
     enrollment_date: Mapped[Date] = mapped_column(Date, nullable=False)
-    deleted: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    status: Mapped[str] = mapped_column(String(10), nullable=False)
+    # deleted: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     department: Mapped['Department'] = relationship(back_populates='students')
     enrollments: Mapped[list['Enrollment']] = relationship(back_populates='student')
@@ -51,7 +52,7 @@ class Department(Base):
 
     department_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     department_name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
-    head_of_department: Mapped[int] = mapped_column(ForeignKey('faculty.faculty_id'))
+    # head_of_department: Mapped[int] = mapped_column(ForeignKey('faculty.faculty_id'))
 
     students: Mapped[list['Student']] = relationship(back_populates='department')
     courses: Mapped[list['Course']] = relationship(back_populates='department')
@@ -143,3 +144,46 @@ class Result(Base):
     student: Mapped['Student'] = relationship(back_populates='results')
     exam: Mapped['Exam'] = relationship(back_populates='results')
     course: Mapped['Course'] = relationship(back_populates='results')
+
+
+Base.metadata.create_all(engine)
+
+# with Session() as db:
+#     faculty = Faculty(
+#         first_name='Mohan',
+#         last_name='Roy',
+#         email='mohan.roy@example.com',
+#         phone='6293855192',
+#         department_id=1,
+#         hire_date=datetime.datetime.strptime('2024/08/01','%Y/%m/%d')
+#     )
+#     department = Department(
+#         department_name='Computer Science & Engineering',
+#         # head_of_department=1
+#     )
+#     student = Student(
+#         first_name='Tony',
+#         last_name='Reichert',
+#         gender='M',
+#         email='tony.reichert@example.com',
+#         phone='8528736532',
+#         date_of_birth= datetime.datetime.strptime('2002/11/09', '%Y/%m/%d'),
+#         address='Springfield, MO, United States', department_id=2,
+#         enrollment_date=datetime.datetime.strptime('2024/09/01', '%Y/%m/%d'),
+#         deleted=False
+#     )
+
+#     try:
+#         db.add_all([faculty, department, student])
+#     except Exception as e:
+#         db.rollback()
+#         print("An error occured")
+
+
+##### SESSION OPERATIONS #####
+
+# from flask import jsonify
+
+# session = Session()
+
+# department = session.query(Department.department_id, Department.department_name).limit(100).all()
