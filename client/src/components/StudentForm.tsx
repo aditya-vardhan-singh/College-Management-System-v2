@@ -23,18 +23,17 @@ interface Department {
   label: string;
 }
 
+interface NullFunction {
+  (): null;
+}
+
 interface StudentFormProps {
-  //   student: StudentType;
-  //   setStudent: Dispatch<SetStateAction<StudentType>>;
-  // handleAddStudentSubmit: Function;
-  isOpen: Function;
-  onClose: Function;
-  onOpenChange: Function;
+  isOpen: NullFunction;
+  onClose: NullFunction;
+  onOpenChange: NullFunction;
 }
 
 export default function StudentForm({
-  // student,
-  // setStudent,
   isOpen,
   onClose,
   onOpenChange,
@@ -57,7 +56,7 @@ export default function StudentForm({
   const fetchDepartments = async () => {
     try {
       const response: { data: { departments: Department[] } } = await axios.get(
-        baseUrl + "/departments/get-all",
+        baseUrl + "/departments/all",
       );
       if (response?.data?.departments) {
         setDepartments(response.data.departments);
@@ -95,15 +94,25 @@ export default function StudentForm({
   }, []);
 
   const handleAddStudentSubmit = async () => {
+    // Set department name from department id
+    const getDepartment = departments.filter((dept) => {
+      return dept.key == student.department_id;
+    });
+
+    if (getDepartment.length > 0) {
+      student.department = getDepartment[0].label;
+    }
+
     if (
-      !student.first_name === "" ||
-      !student.last_name === "" ||
-      !student.gender === "" ||
-      !student.date_of_birth === "" ||
-      !student.department === "" ||
-      !student.enrollment_date === ""
+      student.first_name === "" ||
+      student.last_name === "" ||
+      student.gender === "" ||
+      student.date_of_birth === "" ||
+      student.department === "" ||
+      student.enrollment_date === ""
     ) {
-      toast.warning("Please enter all the required fields");
+      toast.warning("Please enter all the required fields:");
+      console.log(student);
       return;
     }
 

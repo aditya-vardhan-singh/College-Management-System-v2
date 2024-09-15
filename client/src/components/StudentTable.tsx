@@ -39,12 +39,12 @@ export interface StudentType {
   phone: string;
   age: string;
   date_of_birth: string;
-  gender: "Male" | "Female";
+  gender: string;
   address: string;
   department_id: string;
   department: string;
   enrollment_date: string;
-  status: "pending" | "admitted" | "left";
+  status: string;
 }
 
 const columns = [

@@ -14,7 +14,7 @@ def get_students():
     if request.method == 'GET':
         session = Session()
         try:
-            students = session.query(Student).limit(1).all()
+            students = session.query(Student).limit(100).all()
             students_list = [
                 {
                     "id": student.student_id,
@@ -51,14 +51,18 @@ def add_student():
             return jsonify({"message": "Invalid parameters"}), 400
 
         student = data['student']
-        print(student)
 
         with Session() as session:
+            print(student) #
+            print("Ckpt 1") #
+            gender = 'M' if student['gender'] == 'Male' else 'F'
             student_obj = Student(
-                first_name=student['first_name'], last_name=student['last_name'], gender=student['gender'],
+                first_name=student['first_name'], last_name=student['last_name'],
+                gender=gender,
                 email=student['email'],
                 phone=student['phone'], date_of_birth=student['date_of_birth'], address=student['address'], department_id=student['department_id'], enrollment_date=student['enrollment_date'], status=student['status']
             )
+            print("Ckpt 2") #
             try:
                 session.add(student_obj)
                 session.commit()
@@ -92,7 +96,7 @@ def update_student():
                     student_obj.enrollment_date = student.enrollment_date
                     student_obj.phone = student.phone
                     session.commit()
-                    return jsonify({"message": "Student updated successfully"}), 200
+                    return jsonify({"message": "Student details updated successfully"}), 200
                 else:
                     return jsonify({"message": "Student not found"}), 400
             except Exception as e:
