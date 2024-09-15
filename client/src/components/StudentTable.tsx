@@ -30,23 +30,6 @@ import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
 import StudentForm from "./StudentForm";
 
-export interface StudentType {
-  id: string;
-  primary_key: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  age: string;
-  date_of_birth: string;
-  gender: string;
-  address: string;
-  department_id: string;
-  department: string;
-  enrollment_date: string;
-  status: string;
-}
-
 const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FIRST NAME", uid: "first_name", sortable: true },
@@ -566,24 +549,17 @@ export default function StudentTable() {
         </div>
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
-
-  // const [student, setStudent] = useState<StudentType>({
-  //   id: "",
-  //   primary_key: "",
-  //   first_name: "",
-  //   last_name: "",
-  //   gender: "Male",
-  //   email: "",
-  //   phone: "",
-  //   age: "",
-  //   date_of_birth: "",
-  //   address: "",
-  //   department_id: "",
-  //   department: "",
-  //   enrollment_date: "",
-  //   status: "pending",
-  // });
+  }, [
+    selectedKeys,
+    items.length,
+    page,
+    pages,
+    hasSearchFilter,
+    // filteredItems.length,
+    // onNextPage,
+    // onPreviousPage,
+    // users.length,
+  ]);
 
   const StudentModal = ({ isOpen, onClose }) => {
     return (
@@ -658,7 +634,14 @@ export default function StudentTable() {
                     <Button color="danger" variant="light" onPress={onClose}>
                       Close
                     </Button>
-                    <Button color="primary" onPress={onClose}>
+                    <Button
+                      color="primary"
+                      onPress={onClose}
+                      onClick={() => {
+                        handleDeleteUser();
+                        onClose();
+                      }}
+                    >
                       Delete
                     </Button>
                   </ModalFooter>

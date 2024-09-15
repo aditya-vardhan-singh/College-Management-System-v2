@@ -1,11 +1,25 @@
-interface NullFunction {
-  (): void;
+export interface Department {
+  key: string;
+  label: string;
 }
 
-const amd: NullFunction = () => {
-  const a = 2;
-  console.log(a);
-  return;
-};
+export interface NullFunction {
+  (): null;
+}
 
-amd();
+export interface StudentType {
+  id: string;
+  primary_key: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  age: string;
+  date_of_birth: string;
+  gender: string;
+  address: string;
+  department_id: string;
+  department: string;
+  enrollment_date: string;
+  status: string;
+}

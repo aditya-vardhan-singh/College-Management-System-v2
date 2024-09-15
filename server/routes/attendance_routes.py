@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 from routes.utils import department_to_json
 from schema.utils import Session
-from schema.college_models import Department
+from schema.college_models import Department, Student
 
 bp = Blueprint('departments', __name__, url_prefix='/departments')
 

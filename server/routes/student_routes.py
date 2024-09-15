@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy.sql.dml import Delete
 from flask import Blueprint, request, jsonify
-from routes.utils import student_to_json
+from routes.utils import student_to_json, calculate_age
 from schema.utils import Session
 from schema.college_models import Student
 
@@ -15,27 +14,28 @@ def get_students():
         session = Session()
         try:
             students = session.query(Student).limit(100).all()
-            students_list = [
-                {
-                    "id": student.student_id,
-                    "first_name": student.first_name,
-                    "last_name": student.last_name,
-                    "age": "30",
-                    "date_of_birth": student.date_of_birth,
-                    "gender": student.gender,
-                    "email": student.email,
-                    "phone": student.phone,
-                    "address": student.address,
-                    "department_id": student.department_id,
-                    "enrollment_date": student.enrollment_date,
-                    "status": student.status
-                }
-                for student in students
-            ]
-            if students:
-                return jsonify({"users": students_list}), 200
-            else:
+            if students is None:
                 return jsonify({"message": "No records found"}), 400
+            else:
+                students_list = [
+                    {
+                        "id": student.student_id,
+                        "first_name": student.first_name,
+                        "last_name": student.last_name,
+                        "age": calculate_age(str(student.date_of_birth)),
+                        "date_of_birth": student.date_of_birth,
+                        "gender": student.gender,
+                        "email": student.email,
+                        "phone": student.phone,
+                        "address": student.address,
+                        "department_id": student.department_id,
+                        "department": student.department.department_name,
+                        "enrollment_date": student.enrollment_date,
+                        "status": student.status
+                    }
+                    for student in students
+                ]
+                return jsonify({"users": students_list}), 200
         except Exception as e:
             session.rollback()
             return jsonify({"message": "Error getting student records", "error": str(e)}), 500
@@ -53,23 +53,19 @@ def add_student():
         student = data['student']
 
         with Session() as session:
-            print(student) #
-            print("Ckpt 1") #
-            gender = 'M' if student['gender'] == 'Male' else 'F'
             student_obj = Student(
                 first_name=student['first_name'], last_name=student['last_name'],
-                gender=gender,
+                gender=student['gender'],
                 email=student['email'],
                 phone=student['phone'], date_of_birth=student['date_of_birth'], address=student['address'], department_id=student['department_id'], enrollment_date=student['enrollment_date'], status=student['status']
             )
-            print("Ckpt 2") #
             try:
                 session.add(student_obj)
                 session.commit()
                 return jsonify({"message": "Student added successfully"}), 200
             except Exception as e:
                 session.rollback()
-                return jsonify({"message": "Failed to add student"}), 500
+                return jsonify({"message": "Failed to add student", "error": str(e)}), 500
 
 
 @bp.route('/update', methods=['PUT'])
