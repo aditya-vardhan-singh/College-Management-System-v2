@@ -1,5 +1,6 @@
 import {
   Button,
+  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -27,19 +28,18 @@ import { SearchIcon } from "../assets/SearchIcon";
 import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
 import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
-import StudentForm from "./StudentForm";
+import { AddStudentForm, UpdateStudentForm } from "./AllComponents";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FIRST NAME", uid: "first_name", sortable: true },
   { name: "LAST NAME", uid: "last_name", sortable: true },
-  { name: "AGE", uid: "age", sortable: true },
   { name: "GENDER", uid: "gender", sortable: true },
+  { name: "AGE", uid: "age", sortable: true },
   { name: "EMAIL", uid: "email" },
   { name: "PHONE", uid: "phone" },
-  { name: "ADDRESS", uid: "address" },
-  { name: "DEPARTMENT ID", uid: "department_id", sortable: true },
-  { name: "ENROLLMENT DATE", uid: "enrollment_date", sortable: true },
+  { name: "DEPARTMENT", uid: "department", sortable: true },
+  { name: "HIRE DATE", uid: "hire_date", sortable: true },
   { name: "STATUS", uid: "status", sortable: true },
   { name: "ACTIONS", uid: "actions" },
 ];
@@ -50,153 +50,39 @@ const statusOptions = [
   { name: "Left", uid: "left" },
 ];
 
-// const statusColorMap = {
-//   admitted: "success",
-//   left: "danger",
-//   pending: "warning",
-// };
+const statusColorMap = {
+  admitted: "success",
+  left: "danger",
+  pending: "warning",
+};
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "first_name",
   "last_name",
-  "age",
   "email",
   "gender",
+  "status",
   "actions",
 ];
 
 export default function FacultyTable() {
+  // All students
   const [users, setUsers] = React.useState([
     {
-      id: 1,
-      first_name: "Tony",
-      last_name: "Reichert",
-      age: "29",
-      gender: "Male",
-      email: "tony.reichert@example.com",
-      phone: "8528736532",
-      address: "Springfield, MO, United States",
-      department_id: "9",
-      enrollment_date: "2024-09-01",
-      status: "pending",
-    },
-    {
-      id: 2,
-      first_name: "Sarah",
-      last_name: "Connor",
-      age: "34",
-      gender: "Female",
-      email: "sarah.connor@example.com",
-      phone: "6317283564",
-      address: "Los Angeles, CA, United States",
-      department_id: "5",
-      enrollment_date: "2024-08-15",
-      status: "admitted",
-    },
-    {
-      id: 3,
-      first_name: "Michael",
-      last_name: "Johnson",
-      age: "24",
-      gender: "Male",
-      email: "michael.johnson@example.com",
-      phone: "7218456321",
-      address: "New York, NY, United States",
-      department_id: "7",
-      enrollment_date: "2024-07-20",
-      status: "left",
-    },
-    {
-      id: 4,
-      first_name: "Emily",
-      last_name: "Smith",
-      age: "27",
-      gender: "Female",
-      email: "emily.smith@example.com",
-      phone: "3217648123",
-      address: "Chicago, IL, United States",
-      department_id: "3",
-      enrollment_date: "2024-06-10",
-      status: "admitted",
-    },
-    {
-      id: 5,
-      first_name: "David",
-      last_name: "Lee",
-      age: "31",
-      gender: "Male",
-      email: "david.lee@example.com",
-      phone: "4357894321",
-      address: "Houston, TX, United States",
-      department_id: "4",
-      enrollment_date: "2024-09-03",
-      status: "pending",
-    },
-    {
-      id: 6,
-      first_name: "Jessica",
-      last_name: "Brown",
-      age: "26",
-      gender: "Female",
-      email: "jessica.brown@example.com",
-      phone: "9457845632",
-      address: "Phoenix, AZ, United States",
-      department_id: "6",
-      enrollment_date: "2024-05-22",
-      status: "admitted",
-    },
-    {
-      id: 7,
-      first_name: "Robert",
-      last_name: "Miller",
-      age: "28",
-      gender: "Male",
-      email: "robert.miller@example.com",
-      phone: "5893216548",
-      address: "San Francisco, CA, United States",
-      department_id: "2",
-      enrollment_date: "2024-07-11",
-      status: "vacation",
-    },
-    {
-      id: 8,
-      first_name: "Laura",
-      last_name: "Williams",
-      age: "30",
-      gender: "Female",
-      email: "laura.williams@example.com",
-      phone: "6321549876",
-      address: "Miami, FL, United States",
-      department_id: "8",
-      enrollment_date: "2024-08-25",
-      status: "admitted",
-    },
-    {
-      id: 9,
-      first_name: "Daniel",
-      last_name: "Taylor",
-      age: "35",
-      gender: "Male",
-      email: "daniel.taylor@example.com",
-      phone: "7813265432",
-      address: "Seattle, WA, United States",
-      department_id: "1",
-      enrollment_date: "2024-07-01",
-      status: "left",
-    },
-    {
-      id: 10,
-      first_name: "Sophia",
-      last_name: "Davis",
-      age: "29",
-      gender: "Female",
-      email: "sophia.davis@example.com",
-      phone: "9658741235",
-      address: "Boston, MA, United States",
-      department_id: "10",
-      enrollment_date: "2024-06-18",
-      status: "admitted",
+      id: "",
+      first_name: "",
+      last_name: "",
+      age: "",
+      date_of_birth: "",
+      gender: "",
+      email: "",
+      phone: "",
+      address: "",
+      department_id: "",
+      department: "",
+      enrollment_date: "",
+      status: "",
     },
   ]);
   const [filterValue, setFilterValue] = React.useState("");
@@ -205,7 +91,7 @@ export default function FacultyTable() {
     new Set(INITIAL_VISIBLE_COLUMNS),
   );
   const [statusFilter, setStatusFilter] = React.useState("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: "id",
     direction: "ascending",
@@ -290,17 +176,17 @@ export default function FacultyTable() {
       //       </p>
       //     </div>
       //   );
-      // case "status":
-      //   return (
-      //     <Chip
-      //       className="capitalize"
-      //       color={statusColorMap[user.status]}
-      //       size="sm"
-      //       variant="flat"
-      //     >
-      //       {cellValue}
-      //     </Chip>
-      //   );
+      case "status":
+        return (
+          <Chip
+            className="capitalize"
+            color={statusColorMap[user.status]}
+            size="sm"
+            variant="flat"
+          >
+            {cellValue}
+          </Chip>
+        );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
@@ -387,7 +273,7 @@ export default function FacultyTable() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            style={{ borderWidth: 0, boxShadow: "none" }}
+            // style={{ borderWidth: 0, boxShadow: "none" }}
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
@@ -443,7 +329,14 @@ export default function FacultyTable() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
+            <Button
+              color="primary"
+              endContent={<PlusIcon />}
+              onClick={() => {
+                setCurrentOption("Add");
+                onOpen();
+              }}
+            >
               Add New
             </Button>
           </div>
@@ -460,7 +353,9 @@ export default function FacultyTable() {
               onChange={onRowsPerPageChange}
             >
               <option value="5">5</option>
-              <option value="10">10</option>
+              <option value="10" selected>
+                10
+              </option>
               <option value="40">40</option>
               <option value="70">70</option>
             </select>
@@ -482,9 +377,11 @@ export default function FacultyTable() {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
+          {/* {selectedKeys === "all"
             ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+            : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
+          {filteredItems.length !== users.length &&
+            `After search and filter ${filteredItems.length} students in total.`}
         </span>
         <Pagination
           isCompact
@@ -515,7 +412,35 @@ export default function FacultyTable() {
         </div>
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+  }, [
+    selectedKeys,
+    items.length,
+    page,
+    pages,
+    hasSearchFilter,
+    // filteredItems.length,
+    // onNextPage,
+    // onPreviousPage,
+    // users.length,
+  ]);
+
+  const handleDeleteUser = () => {
+    async function deleteUser() {
+      await axios
+        .delete(`${baseUrl}/students/delete`, {
+          params: { id: currentUser.id },
+        })
+        .then((response) => {
+          toast.success(
+            response?.data?.message || "Student deleted successfully",
+          );
+        })
+        .catch((err) => {
+          toast.error(err?.response?.data?.message || "Unable to delete user");
+        });
+    }
+    deleteUser();
+  };
 
   const StudentModal = ({ isOpen, onClose }) => {
     return (
@@ -531,31 +456,80 @@ export default function FacultyTable() {
               {(onClose) => (
                 <>
                   <ModalHeader className="flex flex-col gap-1">
-                    {`${currentUser.first_name} ${currentUser.last_name}`}
+                    Student Details
                   </ModalHeader>
                   <ModalBody>
-                    <p>
-                      ID: {currentUser.id}
-                      <br />
-                      AGE: {currentUser.age}
-                      <br />
-                      GENDER: {currentUser.gender}
-                      <br />
-                      EMAIL: {currentUser.email}
-                      <br />
-                      PHONE: {currentUser.phone}
-                      <br />
-                      ADDRESS: {currentUser.address}
-                      <br />
-                      DEPARTMENT ID: {currentUser.department_id}
-                      <br />
-                      ENROLLMENT DATE: {currentUser.enrollment_date}
-                      <br />
-                      STATUS: {currentUser.status}
-                    </p>
+                    <p className="font-semibold">Personal Details:</p>
+                    <div className="grid grid-cols-6 gap-4">
+                      <Input
+                        isReadOnly
+                        label="Name"
+                        defaultValue={`${currentUser.first_name} ${currentUser.last_name}`}
+                        className="col-span-6"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Date of Birth"
+                        defaultValue={currentUser.date_of_birth}
+                        className="col-span-3"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Gender"
+                        defaultValue={currentUser.gender}
+                        className="col-span-3"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Email"
+                        defaultValue={currentUser.email}
+                        className="col-span-3"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Phone"
+                        defaultValue={currentUser.phone}
+                        className="col-span-3"
+                      />
+
+                      <Input
+                        isReadOnly
+                        label="Address"
+                        defaultValue={currentUser.address}
+                        className="col-span-6"
+                      />
+                    </div>
+
+                    <p className="font-semibold">Academic Details:</p>
+                    <div className="grid grid-cols-6 gap-4">
+                      <Input
+                        isReadOnly
+                        label="Student ID"
+                        defaultValue={currentUser.id}
+                        className="col-span-2"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Department"
+                        defaultValue={currentUser.department}
+                        className="col-span-4"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Enrollment Date"
+                        defaultValue={currentUser.enrollment_date}
+                        className="col-span-3"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Enrollment Status"
+                        defaultValue={currentUser.status}
+                        className="col-span-3"
+                      />
+                    </div>
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button color="default" onPress={onClose}>
                       Close
                     </Button>
                     {/* <Button color="primary" onPress={onClose}>
@@ -575,58 +549,68 @@ export default function FacultyTable() {
             size="2xl"
           >
             <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Confirmation
-                  </ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Are you sure you want to remove{" "}
-                      {`${currentUser.first_name} ${currentUser.last_name}`}
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                      Delete
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
+              {(onClose) => {
+                return currentUser.status === "left" ? (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Alert
+                    </ModalHeader>
+                    <ModalBody>
+                      <p>
+                        {`'${currentUser.first_name} ${currentUser.last_name}' has already been deleted!`}
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="default" onPress={onClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </>
+                ) : (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Confirmation
+                    </ModalHeader>
+                    <ModalBody>
+                      <p>
+                        Are you sure you want to remove{" "}
+                        {`'${currentUser.first_name} ${currentUser.last_name}'`}
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="danger" variant="light" onPress={onClose}>
+                        Close
+                      </Button>
+                      <Button
+                        color="primary"
+                        onClick={() => {
+                          handleDeleteUser();
+                          onClose();
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </ModalFooter>
+                  </>
+                );
+              }}
             </ModalContent>
           </Modal>
         )}
         {currentOption === "Edit" && (
-          <Modal
+          <UpdateStudentForm
+            currentStudentDetails={currentUser}
             isOpen={isOpen}
+            onClose={onClose}
             onOpenChange={onOpenChange}
-            backdrop="blur"
-            size="5xl"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Edit Student
-                  </ModalHeader>
-                  <ModalBody>
-                    <StudentForm />
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                      Update
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
+          />
+        )}
+        {currentOption === "Add" && (
+          <AddStudentForm
+            isOpen={isOpen}
+            onClose={onClose}
+            onOpenChange={onOpenChange}
+          />
         )}
       </>
     );
@@ -634,7 +618,7 @@ export default function FacultyTable() {
 
   useEffect(() => {
     axios
-      .get(`${baseUrl}/student/get`)
+      .get(`${baseUrl}/students/all`)
       .then((response) => {
         if (response?.data?.users) {
           setUsers(response.data.users);
@@ -643,13 +627,16 @@ export default function FacultyTable() {
         }
       })
       .catch((err) => {
-        toast.error(err?.message || "Error getting student records!");
+        console.log(err);
+        toast.error(
+          err?.response?.data?.message || "Error getting student records!",
+        );
       });
   }, []);
 
   return (
     <>
-      <Toaster richColors position="bottom-right" />
+      <Toaster richColors position="bottom-center" />
       <Table
         aria-label="Example table with custom cells, pagination and sorting"
         isHeaderSticky

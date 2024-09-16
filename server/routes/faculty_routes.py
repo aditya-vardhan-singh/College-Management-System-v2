@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 from schema.utils import Session
 from schema.college_models import Faculty
+from server.routes.utils import calculate_age
 
 bp = Blueprint('faculties', __name__, url_prefix='/faculties')
 
@@ -22,8 +23,10 @@ def get_faculty():
                             "id": faculty.faculty_id,
                             "first_name": faculty.first_name,
                             "last_name": faculty.last_name,
+                            "age": calculate_age(faculty.date_of_birth),
                             "email": faculty.email,
                             "phone": faculty.phone,
+                            "gender": faculty.gender,
                             "department_id": faculty.department_id,
                             "department": faculty.department,
                             "hire_date": faculty.hire_date,

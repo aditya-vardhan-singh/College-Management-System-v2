@@ -27,7 +27,7 @@ import { SearchIcon } from "../assets/SearchIcon";
 import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
 import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
-import StudentForm from "./StudentForm";
+import AddStudentForm from "./AddStudentForm";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },

@@ -9,7 +9,7 @@ export interface NullFunction {
 
 export interface StudentType {
   id: string;
-  primary_key: string;
+  // primary_key: string;
   first_name: string;
   last_name: string;
   email: string;

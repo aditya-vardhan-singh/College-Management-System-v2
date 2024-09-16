@@ -15,10 +15,10 @@ class Student(Base):
     gender: Mapped[str] = mapped_column(String(15), nullable=False)
     email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     phone: Mapped[str] = mapped_column(String(15), nullable=True)
-    date_of_birth: Mapped[str] = mapped_column(Date, nullable=False)
+    date_of_birth: Mapped[str] = mapped_column(String(15), nullable=False)
     address: Mapped[Text] = mapped_column(Text, nullable=True)
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.department_id'))
-    enrollment_date: Mapped[str] = mapped_column(Date, nullable=False)
+    enrollment_date: Mapped[str] = mapped_column(String(15), nullable=False)
     status: Mapped[str] = mapped_column(String(10), nullable=False)
     # deleted: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
@@ -53,6 +53,7 @@ class Department(Base):
     department_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     department_name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     # head_of_department: Mapped[int] = mapped_column(ForeignKey('faculty.faculty_id'))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     students: Mapped[list['Student']] = relationship(back_populates='department')
     courses: Mapped[list['Course']] = relationship(back_populates='department')
@@ -67,10 +68,12 @@ class Faculty(Base):
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    gender: Mapped[str] = mapped_column(String(15), nullable=False)
     phone: Mapped[str] = mapped_column(String(15), nullable=True)
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.department_id'))
-    hire_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    hire_date: Mapped[str] = mapped_column(String(15), nullable=False)
     status: Mapped[str] = mapped_column(String(15), nullable=False)
+    date_of_birth: Mapped[str] = mapped_column(String(15), nullable=False)
 
     department: Mapped['Department'] = relationship(back_populates='faculty')
     classrooms: Mapped[list['Classroom']] = relationship(back_populates='faculty')
@@ -97,7 +100,7 @@ class Attendance(Base):
     attendance_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     student_id: Mapped[int] = mapped_column(ForeignKey('students.student_id'))
     course_id: Mapped[int] = mapped_column(ForeignKey('courses.course_id'))
-    attendance_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    attendance_date: Mapped[str] = mapped_column(String(15), nullable=False)
     status: Mapped[str] = mapped_column(String(10), CheckConstraint("status IN ('Present', 'Absent')"), nullable=False)
 
     student: Mapped['Student'] = relationship(back_populates='attendances')
@@ -124,9 +127,10 @@ class Exam(Base):
 
     exam_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     course_id: Mapped[int] = mapped_column(ForeignKey('courses.course_id'))
-    exam_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    exam_date: Mapped[str] = mapped_column(String(15), nullable=False)
     exam_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'Midterm', 'Final', etc.
     max_marks: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     course: Mapped['Course'] = relationship(back_populates='exams')
     results: Mapped[list['Result']] = relationship(back_populates='exam')

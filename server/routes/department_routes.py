@@ -1,6 +1,5 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from routes.utils import department_to_json
 from schema.utils import Session
 from schema.college_models import Department
 
@@ -20,7 +19,7 @@ def get_departments():
                     # Convert department object to json list
                     departments_list = [
                         {"key": dept.department_id, "label": dept.department_name}
-                        for dept in departments
+                        for dept in departments if dept.is_active == True
                     ]
                     return jsonify({"departments": departments_list}), 200
                 else:
@@ -62,6 +61,7 @@ def add_department():
 
 @bp.route('/update', methods=['PUT'])
 def update_department():
+    '''Update existing department details'''
     if request.method == 'PUT':
         data = request.get_json()
         if 'department' not in data:
@@ -82,3 +82,24 @@ def update_department():
             except Exception as e:
                 session.rollback()
                 return jsonify({"message": "Failed to update department"}), 500
+
+
+@bp.route('/delete', methods=['DELETE'])
+def delete_department():
+    '''Deactivate an existing department'''
+    if request.method == 'DELETE':
+        if 'id' not in request.args:
+            return jsonify({"message": "Invalid parameter request"}), 400
+        id = request.args.get('id')
+        with Session() as session:
+            try:
+                department_obj = session.query(Department).filter(Department.department_id == id).first()
+                if department_obj:
+                    department_obj.is_active = False
+                    session.commit()
+                    return jsonify({"message": "Department removed successfully"}), 200
+                else:
+                    return jsonify({"message": "Department details not found in records"}), 400
+            except Exception as e:
+                session.rollback()
+                return jsonify({"message": "Failed to delete department"}), 500

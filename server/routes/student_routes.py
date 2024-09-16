@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask import Blueprint, request, jsonify
-from routes.utils import student_to_json, calculate_age
+from routes.utils import calculate_age
 from schema.utils import Session
 from schema.college_models import Student
 
@@ -79,18 +79,19 @@ def update_student():
 
         with Session() as session:
             try:
-                student_obj = session.query(Student).filter(Student.student_id == student.id).first()
+                student_obj = session.query(Student).filter(Student.student_id == student['id']).first()
 
                 if student_obj:
-                    student_obj.first_name = student.first_name
-                    student_obj.last_name = student.last_name
-                    student_obj.gender = student.gender
-                    student_obj.date_of_birth = student.date_of_birth
-                    student_obj.address = student.address
-                    student_obj.email = student.email
-                    student_obj.department_id = student.department_id
-                    student_obj.enrollment_date = student.enrollment_date
-                    student_obj.phone = student.phone
+                    student_obj.first_name = student['first_name']
+                    student_obj.last_name = student['last_name']
+                    student_obj.gender = student['gender']
+                    student_obj.date_of_birth = student['date_of_birth']
+                    student_obj.address = student['address']
+                    student_obj.email = student['email']
+                    student_obj.department_id = student['department_id']
+                    student_obj.enrollment_date = student['enrollment_date']
+                    student_obj.phone = student['phone']
+                    student_obj.status = student['status']
                     session.commit()
                     return jsonify({"message": "Student details updated successfully"}), 200
                 else:

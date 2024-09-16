@@ -8,7 +8,8 @@ import ResultTable from "./ResultTable";
 import AttendanceTable from "./AttendanceTable";
 import Footer from "./Footer";
 import Card1 from "./Card1";
-import StudentForm from "./StudentForm";
+import AddStudentForm from "./AddStudentForm";
+import UpdateStudentForm from "./UpdateStudentForm";
 
 export {
   NavigationBar,
@@ -21,5 +22,6 @@ export {
   AttendanceTable,
   Card1,
   Footer,
-  StudentForm,
+  AddStudentForm,
+  UpdateStudentForm,
 };

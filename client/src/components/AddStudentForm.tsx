@@ -22,7 +22,7 @@ interface StudentFormProps {
   onOpenChange: NullFunction;
 }
 
-export default function StudentForm({
+export default function AddStudentForm({
   isOpen,
   onClose,
   onOpenChange,
@@ -61,6 +61,7 @@ export default function StudentForm({
     }
   };
 
+  // Fetch departments as soon as page loads
   useEffect(() => {
     fetchDepartments();
   }, []);
@@ -68,7 +69,7 @@ export default function StudentForm({
   // Student details from form
   const [student, setStudent] = useState<StudentType>({
     id: "",
-    primary_key: "",
+    // primary_key: "",
     first_name: "",
     last_name: "",
     gender: "",
@@ -83,10 +84,9 @@ export default function StudentForm({
     status: "pending",
   });
 
-  const handleAddStudentSubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleAddStudentSubmit = async () => {
+    // e: React.FormEvent<HTMLFormElement>,
+    // e.preventDefault();
 
     // Set department name from department id
     const getDepartment = departments.filter((dept) => {
@@ -139,7 +139,7 @@ export default function StudentForm({
               <ModalBody>
                 <Toaster richColors position="bottom-center" />
                 <div className="grid grid-cols-6 gap-4">
-                  <div className="col-span-6">
+                  {/* <div className="col-span-6">
                     {student.id !== "" && (
                       <Input
                         name="id"
@@ -151,7 +151,7 @@ export default function StudentForm({
                         style={{ borderWidth: 0, boxShadow: "none" }}
                       />
                     )}
-                  </div>
+                  </div> */}
                   <Input
                     isRequired
                     required
@@ -184,7 +184,6 @@ export default function StudentForm({
                         return { ...prev, last_name: e.target.value };
                       })
                     }
-                    style={{ borderWidth: 0, boxShadow: "none" }}
                   />
                   <Select
                     isRequired
@@ -192,6 +191,11 @@ export default function StudentForm({
                     label="Gender"
                     className="max-w-xs col-span-2"
                     defaultSelectedKeys={[student.gender]}
+                    onChange={(e) =>
+                      setStudent((prev: StudentType) => {
+                        return { ...prev, gender: e.target.value };
+                      })
+                    }
                   >
                     {genders.map((gender) => (
                       <SelectItem key={gender.key}>{gender.label}</SelectItem>
@@ -213,7 +217,6 @@ export default function StudentForm({
                         return { ...prev, email: e.target.value };
                       })
                     }
-                    style={{ borderWidth: 0, boxShadow: "none" }}
                   />
                   <Input
                     className="col-span-2"
@@ -228,7 +231,6 @@ export default function StudentForm({
                       })
                     }
                     labelPlacement="inside"
-                    style={{ borderWidth: 0, boxShadow: "none" }}
                   />
                   <Input
                     className="col-span-2"
@@ -246,7 +248,6 @@ export default function StudentForm({
                       })
                     }
                     labelPlacement="inside"
-                    style={{ borderWidth: 0, boxShadow: "none" }}
                   />
                   <Select
                     isRequired
@@ -279,7 +280,6 @@ export default function StudentForm({
                       })
                     }
                     labelPlacement="inside"
-                    style={{ borderWidth: 0, boxShadow: "none" }}
                   />
                   <Input
                     className="col-span-6"
@@ -293,7 +293,6 @@ export default function StudentForm({
                       })
                     }
                     labelPlacement="inside"
-                    style={{ borderWidth: 0, boxShadow: "none" }}
                   />
                 </div>
               </ModalBody>
