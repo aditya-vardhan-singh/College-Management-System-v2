@@ -28,7 +28,7 @@ import { SearchIcon } from "../assets/SearchIcon";
 import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
 import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
-import { AddStudentForm, UpdateStudentForm } from "./AllComponents";
+import { AddFacultyForm, UpdateFacultyForm } from "./AllComponents";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
@@ -78,10 +78,9 @@ export default function FacultyTable() {
       gender: "",
       email: "",
       phone: "",
-      address: "",
       department_id: "",
       department: "",
-      enrollment_date: "",
+      hire_date: "",
       status: "",
     },
   ]);
@@ -343,7 +342,9 @@ export default function FacultyTable() {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {users.length} students
+            {users.length > 1
+              ? `Total ${users.length} faculties`
+              : `Total ${users.length} faculty`}
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -381,7 +382,7 @@ export default function FacultyTable() {
             ? "All items selected"
             : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
           {filteredItems.length !== users.length &&
-            `After search and filter ${filteredItems.length} students in total.`}
+            `After search and filter ${filteredItems.length} faculties in total.`}
         </span>
         <Pagination
           isCompact
@@ -427,16 +428,18 @@ export default function FacultyTable() {
   const handleDeleteUser = () => {
     async function deleteUser() {
       await axios
-        .delete(`${baseUrl}/students/delete`, {
+        .delete(`${baseUrl}/faculties/delete`, {
           params: { id: currentUser.id },
         })
         .then((response) => {
           toast.success(
-            response?.data?.message || "Student deleted successfully",
+            response?.data?.message || "Faculty deleted successfully",
           );
         })
         .catch((err) => {
-          toast.error(err?.response?.data?.message || "Unable to delete user");
+          toast.error(
+            err?.response?.data?.message || "Unable to delete faculty",
+          );
         });
     }
     deleteUser();
@@ -456,7 +459,7 @@ export default function FacultyTable() {
               {(onClose) => (
                 <>
                   <ModalHeader className="flex flex-col gap-1">
-                    Student Details
+                    Faculty Details
                   </ModalHeader>
                   <ModalBody>
                     <p className="font-semibold">Personal Details:</p>
@@ -491,20 +494,13 @@ export default function FacultyTable() {
                         defaultValue={currentUser.phone}
                         className="col-span-3"
                       />
-
-                      <Input
-                        isReadOnly
-                        label="Address"
-                        defaultValue={currentUser.address}
-                        className="col-span-6"
-                      />
                     </div>
 
-                    <p className="font-semibold">Academic Details:</p>
+                    <p className="font-semibold">Official Details:</p>
                     <div className="grid grid-cols-6 gap-4">
                       <Input
                         isReadOnly
-                        label="Student ID"
+                        label="Faculty ID"
                         defaultValue={currentUser.id}
                         className="col-span-2"
                       />
@@ -516,13 +512,13 @@ export default function FacultyTable() {
                       />
                       <Input
                         isReadOnly
-                        label="Enrollment Date"
-                        defaultValue={currentUser.enrollment_date}
+                        label="Hire Date"
+                        defaultValue={currentUser.hire_date}
                         className="col-span-3"
                       />
                       <Input
                         isReadOnly
-                        label="Enrollment Status"
+                        label="Status"
                         defaultValue={currentUser.status}
                         className="col-span-3"
                       />
@@ -598,15 +594,15 @@ export default function FacultyTable() {
           </Modal>
         )}
         {currentOption === "Edit" && (
-          <UpdateStudentForm
-            currentStudentDetails={currentUser}
+          <UpdateFacultyForm
+            currentFacultyDetails={currentUser}
             isOpen={isOpen}
             onClose={onClose}
             onOpenChange={onOpenChange}
           />
         )}
         {currentOption === "Add" && (
-          <AddStudentForm
+          <AddFacultyForm
             isOpen={isOpen}
             onClose={onClose}
             onOpenChange={onOpenChange}
@@ -618,10 +614,10 @@ export default function FacultyTable() {
 
   useEffect(() => {
     axios
-      .get(`${baseUrl}/students/all`)
+      .get(`${baseUrl}/faculties/all`)
       .then((response) => {
-        if (response?.data?.users) {
-          setUsers(response.data.users);
+        if (response?.data?.faculties) {
+          setUsers(response.data.faculties);
         } else {
           toast.error("Invalid response parameters!");
         }
@@ -629,7 +625,8 @@ export default function FacultyTable() {
       .catch((err) => {
         console.log(err);
         toast.error(
-          err?.response?.data?.message || "Error getting student records!",
+          err?.response?.data?.message + ": " + err?.response?.data?.error ||
+            "Error getting faculties records!",
         );
       });
   }, []);

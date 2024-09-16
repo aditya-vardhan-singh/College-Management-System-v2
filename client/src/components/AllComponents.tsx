@@ -10,6 +10,8 @@ import Footer from "./Footer";
 import Card1 from "./Card1";
 import AddStudentForm from "./AddStudentForm";
 import UpdateStudentForm from "./UpdateStudentForm";
+import AddFacultyForm from "./AddFacultyForm";
+import UpdateFacultyForm from "./UpdateFacultyForm";
 
 export {
   NavigationBar,
@@ -24,4 +26,6 @@ export {
   Footer,
   AddStudentForm,
   UpdateStudentForm,
+  AddFacultyForm,
+  UpdateFacultyForm,
 };

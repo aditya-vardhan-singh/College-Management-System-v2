@@ -14,31 +14,23 @@ import axios, { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { baseUrl, findAge } from "../data/utils";
-import { StudentType, Department, NullFunction } from "../TypeHints";
+import { FacultyType, Department, NullFunction } from "../TypeHints";
 
-interface StudentFormProps {
-  currentStudentDetails: StudentType;
+interface FacultyFormProps {
   isOpen: NullFunction;
   onClose: NullFunction;
   onOpenChange: NullFunction;
 }
 
-export default function UpdateStudentForm({
-  currentStudentDetails,
+export default function AddFacultyForm({
   isOpen,
   onClose,
   onOpenChange,
-}: StudentFormProps) {
+}: FacultyFormProps) {
   // Genders list
   const genders = [
     { key: "Male", label: "Male" },
     { key: "Female", label: "Female" },
-  ];
-
-  const statuses = [
-    { key: "pending", label: "Pending" },
-    { key: "admitted", label: "Admitted" },
-    { key: "left", label: "Left" },
   ];
 
   // Departments list
@@ -69,8 +61,13 @@ export default function UpdateStudentForm({
     }
   };
 
+  // Fetch departments as soon as page loads
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
   // Student details from form
-  const [student, setStudent] = useState<StudentType>({
+  const [faculty, setFaculty] = useState<FacultyType>({
     id: "",
     first_name: "",
     last_name: "",
@@ -79,69 +76,41 @@ export default function UpdateStudentForm({
     phone: "",
     age: "",
     date_of_birth: "",
-    address: "",
     department_id: "",
     department: "",
-    enrollment_date: "",
+    hire_date: "",
     status: "pending",
   });
 
-  // Fetch departments as soon as page loads
-  useEffect(() => {
-    fetchDepartments();
-  }, []);
-
-  // Log departments after they are fetched
-  useEffect(() => {
-    setStudent(currentStudentDetails);
-  }, [currentStudentDetails]);
-
-  // useEffect(() => {
-  //   fetchDepartments();
-
-  //   // Find default department based on department_id
-  //   let defaultDepartment;
-  //   if (currentStudentDetails.department_id) {
-  //     defaultDepartment = departments.find(
-  //       (dept) => dept.key === currentStudentDetails.department_id,
-  //     );
-  //   }
-
-  //   // Set student details from currentStudentDetails and default department
-  //   setStudent((prevStudent) => ({
-  //     ...currentStudentDetails,
-  //     department: defaultDepartment?.label || "",
-  //     department_id: defaultDepartment?.key || "",
-  //   }));
-  // }, [currentStudentDetails, departments]);
-
-  const handleUpdateStudentSubmit = async () => {
+  const handleAddFacultySubmit = async () => {
     // e: React.FormEvent<HTMLFormElement>,
     // e.preventDefault();
 
     // Set department name from department id
     const getDepartment = departments.filter((dept) => {
-      return dept.key == student.department_id;
+      return dept.key == faculty.department_id;
     });
 
     if (getDepartment.length > 0) {
-      student.department = getDepartment[0].label;
+      faculty.department = getDepartment[0].label;
     }
 
     // Derive age from date of birth
-    student.age = String(findAge(new Date(student.date_of_birth)));
+    faculty.age = String(findAge(new Date(faculty.date_of_birth)));
 
-    // API call to store student to database
+    // API call to store faculty to database
     try {
-      const response = await axios.put(`${baseUrl}/students/update`, {
-        student: student,
+      const response = await axios.post(`${baseUrl}/faculties/add`, {
+        faculty: faculty,
       });
-      toast.success(response?.data?.message || "Student updated successfully.");
+      toast.success(
+        response?.data?.message || "New faculty added successfully.",
+      );
     } catch (err) {
       if (isAxiosError(err)) {
         toast.error(
           err?.response?.data?.message + ": " + err?.response?.data?.error ||
-            "Error updating student",
+            "Error adding new faculty",
         );
       } else {
         toast.error("An unexpected error occured. Please try later.");
@@ -161,39 +130,26 @@ export default function UpdateStudentForm({
       >
         <ModalContent>
           {(onClose) => (
-            <form onSubmit={handleUpdateStudentSubmit}>
+            <form onSubmit={handleAddFacultySubmit}>
               <ModalHeader className="flex flex-col gap-1">
-                Update Student
+                New Faculty
               </ModalHeader>
               <ModalBody>
                 <Toaster richColors position="bottom-center" />
                 <div className="grid grid-cols-6 gap-4">
-                  <Input
-                    name="id"
-                    isReadOnly
-                    type="number"
-                    label="Student ID"
-                    labelPlacement="inside"
-                    value={student.id}
-                    className="col-span-4"
-                  />
-                  <Select
-                    isRequired
-                    required
-                    label="Enrollment Status"
-                    className="max-w-xs col-span-2"
-                    defaultSelectedKeys={[currentStudentDetails.status]}
-                    value={student.status}
-                    onChange={(e) =>
-                      setStudent((prev: StudentType) => {
-                        return { ...prev, status: e.target.value };
-                      })
-                    }
-                  >
-                    {statuses.map((status) => (
-                      <SelectItem key={status.key}>{status.label}</SelectItem>
-                    ))}
-                  </Select>
+                  {/* <div className="col-span-6">
+                    {faculty.id !== "" && (
+                      <Input
+                        name="id"
+                        isReadOnly
+                        type="none"
+                        label="Student ID"
+                        labelPlacement="inside"
+                        defaultValue={faculty.id}
+                        style={{ borderWidth: 0, boxShadow: "none" }}
+                      />
+                    )}
+                  </div> */}
                   <Input
                     isRequired
                     required
@@ -203,10 +159,9 @@ export default function UpdateStudentForm({
                     autoComplete="first_name"
                     label="First Name"
                     labelPlacement="inside"
-                    defaultValue={currentStudentDetails.first_name}
-                    value={student.first_name}
+                    value={faculty.first_name}
                     onChange={(e) =>
-                      setStudent((prev: StudentType) => {
+                      setFaculty((prev: FacultyType) => {
                         return { ...prev, first_name: e.target.value };
                       })
                     }
@@ -221,10 +176,9 @@ export default function UpdateStudentForm({
                     autoComplete="last_name"
                     label="Last Name"
                     labelPlacement="inside"
-                    defaultValue={currentStudentDetails.last_name}
-                    value={student.last_name}
+                    defaultValue={faculty.last_name}
                     onChange={(e) =>
-                      setStudent((prev: StudentType) => {
+                      setFaculty((prev: FacultyType) => {
                         return { ...prev, last_name: e.target.value };
                       })
                     }
@@ -234,10 +188,9 @@ export default function UpdateStudentForm({
                     required
                     label="Gender"
                     className="max-w-xs col-span-2"
-                    defaultSelectedKeys={[currentStudentDetails.gender]}
-                    value={student.gender}
+                    defaultSelectedKeys={[faculty.gender]}
                     onChange={(e) =>
-                      setStudent((prev: StudentType) => {
+                      setFaculty((prev: FacultyType) => {
                         return { ...prev, gender: e.target.value };
                       })
                     }
@@ -256,10 +209,9 @@ export default function UpdateStudentForm({
                     autoComplete="email"
                     label="Email"
                     labelPlacement="inside"
-                    defaultValue={currentStudentDetails.email}
-                    value={student.email}
+                    defaultValue={faculty.email}
                     onChange={(e) =>
-                      setStudent((prev: StudentType) => {
+                      setFaculty((prev: FacultyType) => {
                         return { ...prev, email: e.target.value };
                       })
                     }
@@ -270,10 +222,9 @@ export default function UpdateStudentForm({
                     maxLength={15}
                     autoComplete="phone"
                     label="Phone"
-                    defaultValue={currentStudentDetails.phone}
-                    value={student.phone}
+                    defaultValue={faculty.phone}
                     onChange={(e) =>
-                      setStudent((prev: StudentType) => {
+                      setFaculty((prev: FacultyType) => {
                         return { ...prev, phone: e.target.value };
                       })
                     }
@@ -285,10 +236,9 @@ export default function UpdateStudentForm({
                     required
                     type="date"
                     label="Date of Birth"
-                    defaultValue={currentStudentDetails.date_of_birth}
-                    value={student.date_of_birth}
+                    defaultValue={faculty.date_of_birth}
                     onChange={(e) =>
-                      setStudent((prev: StudentType) => {
+                      setFaculty((prev: FacultyType) => {
                         return {
                           ...prev,
                           date_of_birth: e.target.value.split("T")[0],
@@ -302,16 +252,17 @@ export default function UpdateStudentForm({
                     required
                     label="Department"
                     className="max-w-xs col-span-2"
-                    defaultSelectedKeys={[currentStudentDetails.department_id]}
-                    value={student.department_id}
+                    defaultSelectedKeys={[faculty.department_id]}
                     onChange={(e) =>
-                      setStudent((prev: StudentType) => {
+                      setFaculty((prev: FacultyType) => {
                         return { ...prev, department_id: e.target.value };
                       })
                     }
                   >
-                    {departments.map((dept) => (
-                      <SelectItem key={dept.key}>{dept.label}</SelectItem>
+                    {departments.map((department) => (
+                      <SelectItem key={department.key}>
+                        {department.label}
+                      </SelectItem>
                     ))}
                   </Select>
                   <Input
@@ -320,25 +271,10 @@ export default function UpdateStudentForm({
                     required
                     type="date"
                     label="Enrollment Date"
-                    defaultValue={currentStudentDetails.enrollment_date}
-                    value={student.enrollment_date}
+                    defaultValue={faculty.hire_date}
                     onChange={(e) =>
-                      setStudent((prev: StudentType) => {
-                        return { ...prev, enrollment_date: e.target.value };
-                      })
-                    }
-                    labelPlacement="inside"
-                  />
-                  <Input
-                    className="col-span-6"
-                    type="none"
-                    maxLength={500}
-                    label="Address"
-                    defaultValue={currentStudentDetails.address}
-                    value={student.address}
-                    onChange={(e) =>
-                      setStudent((prev: StudentType) => {
-                        return { ...prev, address: e.target.value };
+                      setFaculty((prev: FacultyType) => {
+                        return { ...prev, hire_date: e.target.value };
                       })
                     }
                     labelPlacement="inside"
@@ -350,7 +286,7 @@ export default function UpdateStudentForm({
                   Close
                 </Button>
                 <Button color="primary" type="submit">
-                  Update
+                  Add
                 </Button>
               </ModalFooter>
             </form>
