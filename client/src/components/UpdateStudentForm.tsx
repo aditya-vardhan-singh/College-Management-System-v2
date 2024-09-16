@@ -1,3 +1,6 @@
+// BUG IN THIS FILE
+// LINE NUMBER: #309
+
 /* Imports */
 import {
   Button,
@@ -302,6 +305,7 @@ export default function UpdateStudentForm({
                     required
                     label="Department"
                     className="max-w-xs col-span-2"
+                    // TODO: not able to select the current department as a default option here.
                     defaultSelectedKeys={[currentStudentDetails.department_id]}
                     value={student.department_id}
                     onChange={(e) =>
