@@ -1,5 +1,6 @@
 import {
   Button,
+  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -19,184 +20,64 @@ import {
   TableRow,
   useDisclosure,
 } from "@nextui-org/react";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { ChevronDownIcon } from "../assets/ChevronDownIcon";
 import { PlusIcon } from "../assets/PlusIcon";
 import { SearchIcon } from "../assets/SearchIcon";
 import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
-import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
-import AddStudentForm from "./AddStudentForm";
+import { AddAttendanceForm, UpdateAttendanceForm } from "./AllComponents";
+import { AttendanceType } from "../TypeHints";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
+  { name: "STUDENT ID", uid: "student_id", sortable: true },
   { name: "FIRST NAME", uid: "first_name", sortable: true },
   { name: "LAST NAME", uid: "last_name", sortable: true },
-  { name: "AGE", uid: "age", sortable: true },
-  { name: "GENDER", uid: "gender", sortable: true },
-  { name: "EMAIL", uid: "email" },
-  { name: "PHONE", uid: "phone" },
-  { name: "ADDRESS", uid: "address" },
-  { name: "DEPARTMENT ID", uid: "department_id", sortable: true },
-  { name: "ENROLLMENT DATE", uid: "enrollment_date", sortable: true },
+  { name: "DEPARTMENT", uid: "department", sortable: true },
+  { name: "COURSE", uid: "course", sortable: true },
+  { name: "DATE", uid: "date", sortable: true },
   { name: "STATUS", uid: "status", sortable: true },
-  { name: "ACTIONS", uid: "actions" },
 ];
 
 const statusOptions = [
-  { name: "Pending", uid: "pending" },
-  { name: "Admitted", uid: "admitted" },
-  { name: "Left", uid: "left" },
+  { name: "Present", uid: "present" },
+  { name: "Absent", uid: "absent" },
 ];
 
-// const statusColorMap = {
-//   admitted: "success",
-//   left: "danger",
-//   pending: "warning",
-// };
+const statusColorMap = {
+  present: "success",
+  absent: "danger",
+};
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "first_name",
   "last_name",
-  "age",
-  "email",
-  "gender",
+  "department",
+  "course",
+  "date",
+  "status",
   "actions",
 ];
 
 export default function AttendanceTable() {
-  const [users, setUsers] = React.useState([
+  // All students
+  const [attendances, setAttendances] = React.useState<AttendanceType[]>([
     {
-      id: 1,
-      first_name: "Tony",
-      last_name: "Reichert",
-      age: "29",
-      gender: "Male",
-      email: "tony.reichert@example.com",
-      phone: "8528736532",
-      address: "Springfield, MO, United States",
-      department_id: "9",
-      enrollment_date: "2024-09-01",
-      status: "pending",
-    },
-    {
-      id: 2,
-      first_name: "Sarah",
-      last_name: "Connor",
-      age: "34",
-      gender: "Female",
-      email: "sarah.connor@example.com",
-      phone: "6317283564",
-      address: "Los Angeles, CA, United States",
-      department_id: "5",
-      enrollment_date: "2024-08-15",
-      status: "admitted",
-    },
-    {
-      id: 3,
-      first_name: "Michael",
-      last_name: "Johnson",
-      age: "24",
-      gender: "Male",
-      email: "michael.johnson@example.com",
-      phone: "7218456321",
-      address: "New York, NY, United States",
-      department_id: "7",
-      enrollment_date: "2024-07-20",
-      status: "left",
-    },
-    {
-      id: 4,
-      first_name: "Emily",
-      last_name: "Smith",
-      age: "27",
-      gender: "Female",
-      email: "emily.smith@example.com",
-      phone: "3217648123",
-      address: "Chicago, IL, United States",
-      department_id: "3",
-      enrollment_date: "2024-06-10",
-      status: "admitted",
-    },
-    {
-      id: 5,
-      first_name: "David",
-      last_name: "Lee",
-      age: "31",
-      gender: "Male",
-      email: "david.lee@example.com",
-      phone: "4357894321",
-      address: "Houston, TX, United States",
-      department_id: "4",
-      enrollment_date: "2024-09-03",
-      status: "pending",
-    },
-    {
-      id: 6,
-      first_name: "Jessica",
-      last_name: "Brown",
-      age: "26",
-      gender: "Female",
-      email: "jessica.brown@example.com",
-      phone: "9457845632",
-      address: "Phoenix, AZ, United States",
-      department_id: "6",
-      enrollment_date: "2024-05-22",
-      status: "admitted",
-    },
-    {
-      id: 7,
-      first_name: "Robert",
-      last_name: "Miller",
-      age: "28",
-      gender: "Male",
-      email: "robert.miller@example.com",
-      phone: "5893216548",
-      address: "San Francisco, CA, United States",
-      department_id: "2",
-      enrollment_date: "2024-07-11",
-      status: "vacation",
-    },
-    {
-      id: 8,
-      first_name: "Laura",
-      last_name: "Williams",
-      age: "30",
-      gender: "Female",
-      email: "laura.williams@example.com",
-      phone: "6321549876",
-      address: "Miami, FL, United States",
-      department_id: "8",
-      enrollment_date: "2024-08-25",
-      status: "admitted",
-    },
-    {
-      id: 9,
-      first_name: "Daniel",
-      last_name: "Taylor",
-      age: "35",
-      gender: "Male",
-      email: "daniel.taylor@example.com",
-      phone: "7813265432",
-      address: "Seattle, WA, United States",
-      department_id: "1",
-      enrollment_date: "2024-07-01",
-      status: "left",
-    },
-    {
-      id: 10,
-      first_name: "Sophia",
-      last_name: "Davis",
-      age: "29",
-      gender: "Female",
-      email: "sophia.davis@example.com",
-      phone: "9658741235",
-      address: "Boston, MA, United States",
-      department_id: "10",
-      enrollment_date: "2024-06-18",
-      status: "admitted",
+      id: "",
+      student: {
+        id: "",
+        first_name: "",
+        last_name: "",
+        department: "",
+        department_id: "",
+      },
+      course: "",
+      attendance_date: "",
+      status: "",
     },
   ]);
   const [filterValue, setFilterValue] = React.useState("");
@@ -205,7 +86,7 @@ export default function AttendanceTable() {
     new Set(INITIAL_VISIBLE_COLUMNS),
   );
   const [statusFilter, setStatusFilter] = React.useState("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: "id",
     direction: "ascending",
@@ -223,11 +104,11 @@ export default function AttendanceTable() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
+    let filteredUsers = [...attendances];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        (user.first_name + user.last_name)
+      filteredUsers = filteredUsers.filter((exam) =>
+        (exam.student.first_name + exam.student.last_name)
           .toLowerCase()
           .includes(filterValue.toLowerCase()),
       );
@@ -236,13 +117,13 @@ export default function AttendanceTable() {
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status),
+      filteredUsers = filteredUsers.filter((exam) =>
+        Array.from(statusFilter).includes(exam.status),
       );
     }
 
     return filteredUsers;
-  }, [users, filterValue, statusFilter, hasSearchFilter]);
+  }, [attendances, filterValue, statusFilter, hasSearchFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -264,7 +145,7 @@ export default function AttendanceTable() {
   }, [sortDescriptor, items]);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [currentUser, setCurrentUser] = useState(users[0]);
+  const [currentUser, setCurrentUser] = useState(attendances[0]);
   const [currentOption, setCurrentOption] = useState<string>("");
 
   const renderCell = React.useCallback((user, columnKey) => {
@@ -290,17 +171,17 @@ export default function AttendanceTable() {
       //       </p>
       //     </div>
       //   );
-      // case "status":
-      //   return (
-      //     <Chip
-      //       className="capitalize"
-      //       color={statusColorMap[user.status]}
-      //       size="sm"
-      //       variant="flat"
-      //     >
-      //       {cellValue}
-      //     </Chip>
-      //   );
+      case "status":
+        return (
+          <Chip
+            className="capitalize"
+            color={statusColorMap[user.status]}
+            size="sm"
+            variant="flat"
+          >
+            {cellValue}
+          </Chip>
+        );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
@@ -387,7 +268,7 @@ export default function AttendanceTable() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            style={{ borderWidth: 0, boxShadow: "none" }}
+            // style={{ borderWidth: 0, boxShadow: "none" }}
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
@@ -443,14 +324,23 @@ export default function AttendanceTable() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
-              Add New
+            <Button
+              color="primary"
+              endContent={<PlusIcon />}
+              onClick={() => {
+                setCurrentOption("Add");
+                onOpen();
+              }}
+            >
+              Mark Attendance
             </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {users.length} students
+            {attendances.length > 1
+              ? `Total ${attendances.length} faculties`
+              : `Total ${attendances.length} faculty`}
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -460,7 +350,9 @@ export default function AttendanceTable() {
               onChange={onRowsPerPageChange}
             >
               <option value="5">5</option>
-              <option value="10">10</option>
+              <option value="10" selected>
+                10
+              </option>
               <option value="40">40</option>
               <option value="70">70</option>
             </select>
@@ -473,7 +365,7 @@ export default function AttendanceTable() {
     statusFilter,
     visibleColumns,
     onRowsPerPageChange,
-    users.length,
+    attendances.length,
     onSearchChange,
     hasSearchFilter,
   ]);
@@ -482,9 +374,11 @@ export default function AttendanceTable() {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
+          {/* {selectedKeys === "all"
             ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+            : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
+          {filteredItems.length !== attendances.length &&
+            `After search and filter ${filteredItems.length} faculties in total.`}
         </span>
         <Pagination
           isCompact
@@ -515,7 +409,37 @@ export default function AttendanceTable() {
         </div>
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+  }, [
+    selectedKeys,
+    items.length,
+    page,
+    pages,
+    hasSearchFilter,
+    // filteredItems.length,
+    // onNextPage,
+    // onPreviousPage,
+    // attendances.length,
+  ]);
+
+  const handleDeleteUser = () => {
+    async function deleteUser() {
+      await axios
+        .delete(`${baseUrl}/attendances/delete`, {
+          params: { id: currentUser.id },
+        })
+        .then((response) => {
+          toast.success(
+            response?.data?.message || "Attendance deleted successfully",
+          );
+        })
+        .catch((err) => {
+          toast.error(
+            err?.response?.data?.message || "Unable to delete attendance",
+          );
+        });
+    }
+    deleteUser();
+  };
 
   const StudentModal = ({ isOpen, onClose }) => {
     return (
@@ -531,31 +455,55 @@ export default function AttendanceTable() {
               {(onClose) => (
                 <>
                   <ModalHeader className="flex flex-col gap-1">
-                    {`${currentUser.first_name} ${currentUser.last_name}`}
+                    Attendance Details
                   </ModalHeader>
                   <ModalBody>
-                    <p>
-                      ID: {currentUser.id}
-                      <br />
-                      AGE: {currentUser.age}
-                      <br />
-                      GENDER: {currentUser.gender}
-                      <br />
-                      EMAIL: {currentUser.email}
-                      <br />
-                      PHONE: {currentUser.phone}
-                      <br />
-                      ADDRESS: {currentUser.address}
-                      <br />
-                      DEPARTMENT ID: {currentUser.department_id}
-                      <br />
-                      ENROLLMENT DATE: {currentUser.enrollment_date}
-                      <br />
-                      STATUS: {currentUser.status}
-                    </p>
+                    <p className="font-semibold">Student Details:</p>
+                    <div className="grid grid-cols-6 gap-4">
+                      <Input
+                        isReadOnly
+                        label="Name"
+                        defaultValue={`${currentUser.student.first_name} ${currentUser.student.last_name}`}
+                        className="col-span-6"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Department"
+                        defaultValue={currentUser.student.department}
+                        className="col-span-3"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Student ID"
+                        defaultValue={currentUser.student.id}
+                        className="col-span-3"
+                      />
+                    </div>
+
+                    <p className="font-semibold">Other Details:</p>
+                    <div className="grid grid-cols-6 gap-4">
+                      <Input
+                        isReadOnly
+                        label="Date"
+                        defaultValue={currentUser.attendance_date}
+                        className="col-span-2"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Marked Status"
+                        defaultValue={currentUser.status}
+                        className="col-span-4"
+                      />
+                      <Input
+                        isReadOnly
+                        label="Course"
+                        defaultValue={currentUser.course}
+                        className="col-span-3"
+                      />
+                    </div>
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button color="default" onPress={onClose}>
                       Close
                     </Button>
                     {/* <Button color="primary" onPress={onClose}>
@@ -575,58 +523,68 @@ export default function AttendanceTable() {
             size="2xl"
           >
             <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Confirmation
-                  </ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Are you sure you want to remove{" "}
-                      {`${currentUser.first_name} ${currentUser.last_name}`}
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                      Delete
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
+              {(onClose) => {
+                return currentUser.status === "left" ? (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Alert
+                    </ModalHeader>
+                    <ModalBody>
+                      <p>
+                        {`'${currentUser.student.first_name} ${currentUser.student.last_name}' has already been deleted!`}
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="default" onPress={onClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </>
+                ) : (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Confirmation
+                    </ModalHeader>
+                    <ModalBody>
+                      <p>
+                        Are you sure you want to remove{" "}
+                        {`'${currentUser.student.first_name} ${currentUser.student.last_name}'`}
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="danger" variant="light" onPress={onClose}>
+                        Close
+                      </Button>
+                      <Button
+                        color="primary"
+                        onClick={() => {
+                          handleDeleteUser();
+                          onClose();
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </ModalFooter>
+                  </>
+                );
+              }}
             </ModalContent>
           </Modal>
         )}
         {currentOption === "Edit" && (
-          <Modal
+          <UpdateAttendanceForm
+            currentFacultyDetails={currentUser}
             isOpen={isOpen}
+            onClose={onClose}
             onOpenChange={onOpenChange}
-            backdrop="blur"
-            size="5xl"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Edit Student
-                  </ModalHeader>
-                  <ModalBody>
-                    <StudentForm />
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                      Update
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
+          />
+        )}
+        {currentOption === "Add" && (
+          <AddAttendanceForm
+            isOpen={isOpen}
+            onClose={onClose}
+            onOpenChange={onOpenChange}
+          />
         )}
       </>
     );
@@ -634,22 +592,25 @@ export default function AttendanceTable() {
 
   useEffect(() => {
     axios
-      .get(`${baseUrl}/student/get`)
+      .get(`${baseUrl}/attendances/all`)
       .then((response) => {
-        if (response?.data?.users) {
-          setUsers(response.data.users);
+        if (response?.data?.faculties) {
+          setAttendances(response.data.faculties);
         } else {
           toast.error("Invalid response parameters!");
         }
       })
       .catch((err) => {
-        toast.error(err?.message || "Error getting student records!");
+        console.log(err);
+        toast.error(
+          err?.response?.data?.message || "Error getting attendance records!",
+        );
       });
   }, []);
 
   return (
     <>
-      <Toaster richColors position="bottom-right" />
+      <Toaster richColors position="bottom-center" />
       <Table
         aria-label="Example table with custom cells, pagination and sorting"
         isHeaderSticky
@@ -677,7 +638,7 @@ export default function AttendanceTable() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No users found"} items={sortedItems}>
+        <TableBody emptyContent={"No attendances found"} items={sortedItems}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (

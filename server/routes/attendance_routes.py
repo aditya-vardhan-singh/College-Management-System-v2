@@ -5,7 +5,7 @@ from routes.utils import department_to_json
 from schema.utils import Session
 from schema.college_models import Attendance
 
-bp = Blueprint('departments', __name__, url_prefix='/departments')
+bp = Blueprint('attendances', __name__, url_prefix='/attendances')
 
 
 @bp.route('/all', methods=['GET'])
@@ -22,15 +22,14 @@ def get_attendances():
                     attendances_list = [
                         {
                             "id": attendance.attendance_id,
-                            "student_id": attendance.student_id,
                             "student":
                                 {
+                                    "id": attendance.student.student_id,
                                     "first_name": attendance.student.first_name,
                                     "last_name": attendance.student.last_name,
                                     "department": attendance.student.department,
-                                    "id": attendance.student.student_id
+                                    "department_id": attendance.student.department_id
                                 },
-                            "course_id": attendance.course_id,
                             "course": attendance.course,
                             "attendance_date": attendance.attendance_date,
                             "status": attendance.status
@@ -40,10 +39,12 @@ def get_attendances():
                     return jsonify({"attendances": attendances_list}), 200
                 else:
                     # Department list empty
+                    print("No records found")
                     return jsonify({"message": "No records found"}), 400
             except Exception as e:
                 session.rollback()
-                return jsonify({"message": "Error getting attendance records", "error": str(e)}), 500
+                print("Error getting attendance records: ", str(e))
+                return jsonify({"message": "Error getting attendance records"}), 500
 
 
 @bp.route('/add', methods=['POST'])

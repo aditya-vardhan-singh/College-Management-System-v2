@@ -31,17 +31,9 @@ import AddStudentForm from "./AddStudentForm";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "FIRST NAME", uid: "first_name", sortable: true },
-  { name: "LAST NAME", uid: "last_name", sortable: true },
-  { name: "AGE", uid: "age", sortable: true },
-  { name: "GENDER", uid: "gender", sortable: true },
-  { name: "EMAIL", uid: "email" },
-  { name: "PHONE", uid: "phone" },
-  { name: "ADDRESS", uid: "address" },
-  { name: "DEPARTMENT ID", uid: "department_id", sortable: true },
-  { name: "ENROLLMENT DATE", uid: "enrollment_date", sortable: true },
-  { name: "STATUS", uid: "status", sortable: true },
-  { name: "ACTIONS", uid: "actions" },
+  { name: "COURSE NAME", uid: "course_name", sortable: true },
+  { name: "COURSE CODE", uid: "course_code", sortable: true },
+  { name: "DEPARTMENT", uid: "department", sortable: true },
 ];
 
 const statusOptions = [
@@ -58,12 +50,9 @@ const statusOptions = [
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
-  "first_name",
-  "last_name",
-  "age",
-  "email",
-  "gender",
-  "actions",
+  "course_name",
+  "course_code",
+  "department",
 ];
 
 export default function ExamTable() {

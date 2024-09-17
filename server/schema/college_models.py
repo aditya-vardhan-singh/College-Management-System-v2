@@ -37,6 +37,7 @@ class Course(Base):
     course_code: Mapped[str] = mapped_column(String(10), unique=True, nullable=False)
     credits: Mapped[int] = mapped_column(Integer, nullable=False)
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.department_id'))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     department: Mapped['Department'] = relationship(back_populates='courses')
     enrollments: Mapped[list['Enrollment']] = relationship(back_populates='course')
