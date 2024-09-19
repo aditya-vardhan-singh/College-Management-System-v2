@@ -87,7 +87,7 @@ class Enrollment(Base):
     enrollment_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     student_id: Mapped[int] = mapped_column(ForeignKey('students.student_id'))
     course_id: Mapped[int] = mapped_column(ForeignKey('courses.course_id'))
-    enrollment_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    enrollment_date: Mapped[str] = mapped_column(String(15), nullable=False)
     grade: Mapped[str] = mapped_column(String(2), nullable=True)
 
     student: Mapped['Student'] = relationship(back_populates='enrollments')

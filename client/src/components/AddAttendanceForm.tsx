@@ -1,6 +1,7 @@
-/* Imports */
+import React, { useEffect, useState } from "react";
 import {
   Button,
+  DatePicker,
   Input,
   Modal,
   ModalBody,
@@ -11,10 +12,16 @@ import {
   SelectItem,
 } from "@nextui-org/react";
 import axios, { isAxiosError } from "axios";
-import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
-import { baseUrl, findAge } from "../data/utils";
-import { AttendanceType, Department, NullFunction } from "../TypeHints";
+import { baseUrl } from "../data/utils";
+import {
+  AttendanceType,
+  CourseType,
+  Department,
+  NullFunction,
+} from "../TypeHints";
+import { AttendanceList } from "./AllComponents";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
 interface FacultyFormProps {
   isOpen: NullFunction;
@@ -27,271 +34,205 @@ export default function AddAttendanceForm({
   onClose,
   onOpenChange,
 }: FacultyFormProps) {
-  // Genders list
-  const genders = [
-    { key: "Male", label: "Male" },
-    { key: "Female", label: "Female" },
-  ];
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [courses, setCourses] = useState<{ key: string; label: string }[]>([]);
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [attendance, setAttendance] = useState<AttendanceType>({
+    department: "",
+    department_id: "",
+    course: "",
+    course_id: "",
+    attendance_date: "",
+    student_ids: [],
+  });
 
-  // Departments list
-  const [departments, setDepartments] = useState<Department[]>([
-    {
-      key: "",
-      label: "",
-    },
-  ]);
-
-  // Fetch departments from database
   const fetchDepartments = async () => {
     try {
-      const response: { data: { departments: Department[] } } = await axios.get(
-        baseUrl + "/departments/all",
-      );
+      const response = await axios.get(baseUrl + "/departments/all");
       if (response?.data?.departments) {
         setDepartments(response.data.departments);
       }
-    } catch (err: { response: { data: { message: string } } }) {
-      if (axios.isAxiosError(err)) {
-        toast.error(
-          err?.response?.data?.message || "Unable to get departments list!",
-        );
+    } catch (err) {
+      if (isAxiosError(err)) {
+        toast.error("Unable to get departments list.");
       } else {
-        toast.error("An unexptected error occured. Please try again later.");
+        toast.error("Unexpected error occurred. Please try again later.");
       }
     }
   };
 
-  // Fetch departments as soon as page loads
+  const fetchCourses = async (departmentId: string) => {
+    try {
+      // Fetch all courses in respective department
+      const response: { data: { courses: CourseType[] } } = await axios.get(
+        `${baseUrl}/courses/by-department`,
+        { params: { department_id: departmentId } },
+      );
+      // If successful in getting departments, set variable value.
+      if (response?.data?.courses) {
+        const coursesList = response.data.courses.map((course) => ({
+          key: course.course_code,
+          label: course.course_name,
+        }));
+        setCourses(coursesList);
+      }
+    } catch (err) {
+      if (isAxiosError(err)) {
+        toast.error("Error occurred fetching courses records");
+      } else {
+        toast.error(
+          "Unexpected error occurred while fetching courses records. Please try again later.",
+        );
+      }
+    }
+  };
+
   useEffect(() => {
     fetchDepartments();
   }, []);
 
-  // Student details from form
-  const [attendance, setAttendance] = useState<AttendanceType>({
-    id: "",
-    student: {
-      id: "",
-      first_name: "",
-      last_name: "",
-      department: "",
-      department_id: "",
-    },
-    course: "",
-    attendance_date: "",
-    status: "",
-  });
+  const handleDepartmentChange = async (value: string) => {
+    setSelectedDepartment(value);
+    setSelectedCourse("");
+    setCourses([]);
 
-  const handleAddFacultySubmit = async () => {
-    // e: React.FormEvent<HTMLFormElement>,
-    // e.preventDefault();
+    // Update department id and name in student details
+    setAttendance((prev) => ({
+      ...prev,
+      department_id: value,
+      department: departments.find((dept) => dept.key === value)?.label || "",
+      course_id: "",
+      course: "",
+    }));
+    await fetchCourses(value);
+  };
 
-    // Set department name from department id
-    const getDepartment = departments.filter((dept) => {
-      return dept.key == attendance.student.department_id;
-    });
+  const handleCourseChange = (value: string) => {
+    setSelectedCourse(value);
 
-    if (getDepartment.length > 0) {
-      attendance.student.department = getDepartment[0].label;
-    }
+    // Update course name in student details
+    setAttendance((prev) => ({
+      ...prev,
+      course_id: value,
+      course: courses.find((course) => course.key === value)?.label || "",
+    }));
+  };
 
-    // Derive age from date of birth
-    // attendance.age = String(findAge(new Date(attendance.date_of_birth)));
-
-    // API call to store attendance to database
+  const handleAddAttendanceSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
+    e.preventDefault();
     try {
-      const response = await axios.post(`${baseUrl}/faculties/add`, {
-        attendance: attendance,
+      const response = await axios.post(`${baseUrl}/attendances/add`, {
+        attendance,
       });
       toast.success(
         response?.data?.message || "New attendance added successfully.",
       );
+      onClose();
     } catch (err) {
       if (isAxiosError(err)) {
         toast.error(
-          err?.response?.data?.message + ": " + err?.response?.data?.error ||
-            "Error adding new attendance",
+          err?.response?.data?.message || "Error adding new attendance",
         );
       } else {
-        toast.error("An unexpected error occured. Please try later.");
+        toast.error("An unexpected error occurred. Please try again later.");
       }
     }
+  };
 
-    onClose();
+  const handleArrayFromList = (selectedStudents: string[]) => {
+    setAttendance((prev) => ({
+      ...prev,
+      student_ids: selectedStudents,
+    }));
   };
 
   return (
-    <>
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        backdrop="blur"
-        size="5xl"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <form onSubmit={handleAddFacultySubmit}>
-              <ModalHeader className="flex flex-col gap-1">
-                Mark Attendance
-              </ModalHeader>
-              <ModalBody>
-                <Toaster richColors position="bottom-center" />
-                <div className="grid grid-cols-6 gap-4">
-                  {/* <div className="col-span-6">
-                    {attendance.id !== "" && (
-                      <Input
-                        name="id"
-                        isReadOnly
-                        type="none"
-                        label="Student ID"
-                        labelPlacement="inside"
-                        defaultValue={attendance.id}
-                        style={{ borderWidth: 0, boxShadow: "none" }}
-                      />
-                    )}
-                  </div> */}
-                  <Input
-                    isRequired
-                    required
-                    className="col-span-3"
-                    type="text"
-                    maxLength={50}
-                    autoComplete="first_name"
-                    label="First Name"
-                    labelPlacement="inside"
-                    value={attendance.first_name}
-                    onChange={(e) =>
-                      setAttendance((prev: FacultyType) => {
-                        return { ...prev, first_name: e.target.value };
-                      })
-                    }
-                    // style={{ borderWidth: 0, boxShadow: "none" }}
-                  />
-                  <Input
-                    isRequired
-                    required
-                    className="col-span-3"
-                    type="text"
-                    maxLength={50}
-                    autoComplete="last_name"
-                    label="Last Name"
-                    labelPlacement="inside"
-                    defaultValue={attendance.last_name}
-                    onChange={(e) =>
-                      setAttendance((prev: FacultyType) => {
-                        return { ...prev, last_name: e.target.value };
-                      })
-                    }
-                  />
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      backdrop="blur"
+      size="5xl"
+    >
+      <ModalContent>
+        {(onClose) => (
+          <form onSubmit={handleAddAttendanceSubmit}>
+            <ModalHeader className="flex flex-col gap-1">
+              Mark Attendance
+            </ModalHeader>
+            <ModalBody>
+              <Toaster richColors position="bottom-center" />
+              <div className="grid grid-cols-6 gap-4">
+                <Select
+                  isRequired
+                  label="Select Department"
+                  className="max-w-xs col-span-2"
+                  value={selectedDepartment}
+                  onChange={(e) => handleDepartmentChange(e.target.value)}
+                >
+                  {departments.map((department) => (
+                    <SelectItem key={department.key} value={department.key}>
+                      {department.label}
+                    </SelectItem>
+                  ))}
+                </Select>
+
+                {selectedDepartment && (
                   <Select
                     isRequired
-                    required
-                    label="Gender"
+                    label="Select Course"
                     className="max-w-xs col-span-2"
-                    defaultSelectedKeys={[attendance.gender]}
-                    onChange={(e) =>
-                      setAttendance((prev: FacultyType) => {
-                        return { ...prev, gender: e.target.value };
-                      })
-                    }
+                    value={selectedCourse}
+                    onChange={(e) => handleCourseChange(e.target.value)}
                   >
-                    {genders.map((gender) => (
-                      <SelectItem key={gender.key}>{gender.label}</SelectItem>
-                    ))}
-                  </Select>
-                  <Input
-                    className="col-span-2"
-                    isRequired
-                    required
-                    isClearable
-                    type="email"
-                    maxLength={100}
-                    autoComplete="email"
-                    label="Email"
-                    labelPlacement="inside"
-                    defaultValue={attendance.email}
-                    onChange={(e) =>
-                      setAttendance((prev: FacultyType) => {
-                        return { ...prev, email: e.target.value };
-                      })
-                    }
-                  />
-                  <Input
-                    className="col-span-2"
-                    type="number"
-                    maxLength={15}
-                    autoComplete="phone"
-                    label="Phone"
-                    defaultValue={attendance.phone}
-                    onChange={(e) =>
-                      setAttendance((prev: FacultyType) => {
-                        return { ...prev, phone: e.target.value };
-                      })
-                    }
-                    labelPlacement="inside"
-                  />
-                  <Input
-                    className="col-span-2"
-                    isRequired
-                    required
-                    type="date"
-                    label="Date of Birth"
-                    defaultValue={attendance.date_of_birth}
-                    onChange={(e) =>
-                      setAttendance((prev: FacultyType) => {
-                        return {
-                          ...prev,
-                          date_of_birth: e.target.value.split("T")[0],
-                        };
-                      })
-                    }
-                    labelPlacement="inside"
-                  />
-                  <Select
-                    isRequired
-                    required
-                    label="Department"
-                    className="max-w-xs col-span-2"
-                    defaultSelectedKeys={[attendance.department_id]}
-                    onChange={(e) =>
-                      setAttendance((prev: FacultyType) => {
-                        return { ...prev, department_id: e.target.value };
-                      })
-                    }
-                  >
-                    {departments.map((department) => (
-                      <SelectItem key={department.key}>
-                        {department.label}
+                    {courses.map((course) => (
+                      <SelectItem key={course.key} value={course.key}>
+                        {course.label}
                       </SelectItem>
                     ))}
                   </Select>
-                  <Input
-                    className="col-span-2"
-                    isRequired
-                    required
-                    type="date"
-                    label="Enrollment Date"
-                    defaultValue={attendance.hire_date}
-                    onChange={(e) =>
-                      setAttendance((prev: FacultyType) => {
-                        return { ...prev, hire_date: e.target.value };
-                      })
-                    }
-                    labelPlacement="inside"
-                  />
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" type="submit">
-                  Add
-                </Button>
-              </ModalFooter>
-            </form>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+                )}
+
+                {selectedCourse && (
+                  <>
+                    <DatePicker
+                      label="Date"
+                      className="max-w-full col-span-2"
+                      maxValue={today(getLocalTimeZone())}
+                      defaultValue={today(getLocalTimeZone())}
+                    />
+                    <div className="col-span-6">
+                      <AttendanceList
+                        department_id={attendance.department_id}
+                        course_id={attendance.course_id}
+                        sendStudentListToParent={handleArrayFromList}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={onClose}>
+                Close
+              </Button>
+              {selectedCourse && (
+                <>
+                  <Button
+                    color="primary"
+                    type="submit"
+                    disabled={!selectedCourse}
+                  >
+                    Mark
+                  </Button>
+                </>
+              )}
+            </ModalFooter>
+          </form>
+        )}
+      </ModalContent>
+    </Modal>
   );
 }

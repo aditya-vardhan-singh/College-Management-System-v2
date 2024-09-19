@@ -24,9 +24,10 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { ChevronDownIcon } from "../assets/ChevronDownIcon";
-import { PlusIcon } from "../assets/PlusIcon";
+// import { PlusIcon } from "../assets/PlusIcon";
 import { SearchIcon } from "../assets/SearchIcon";
 import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
+import { AddNoteIcon } from "../assets/AddNoteIcon";
 import { baseUrl, capitalize } from "../data/utils";
 import { AddAttendanceForm, UpdateAttendanceForm } from "./AllComponents";
 import { AttendanceType } from "../TypeHints";
@@ -326,7 +327,7 @@ export default function AttendanceTable() {
             </Dropdown>
             <Button
               color="primary"
-              endContent={<PlusIcon />}
+              endContent={<AddNoteIcon />}
               onClick={() => {
                 setCurrentOption("Add");
                 onOpen();

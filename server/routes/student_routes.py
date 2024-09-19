@@ -1,9 +1,11 @@
 from datetime import datetime
 
+from sqlalchemy.sql.expression import and_
+
 from flask import Blueprint, request, jsonify
 from routes.utils import calculate_age
 from schema.utils import Session
-from schema.college_models import Student
+from schema.college_models import Enrollment, Student
 
 bp = Blueprint('students', __name__, url_prefix='/students')
 
@@ -43,6 +45,20 @@ def get_students():
             session.close()
 
 
+# @bp.route('/get-list', methods=['GET'])
+# def get_student_list():
+#     if request.method == 'GET':
+#         # Validate parameters
+#         if 'course_id' not in request.args:
+#             print("Invalid parameter request")
+#             return jsonify({"message": "Invalid parameter request"}), 400
+
+#         course_id = request.arge['course_id']
+
+#         with Session() as session:
+#             students = session.query(Enrollment).filter(and_(Student.department_id == ))
+
+
 @bp.route('/add', methods=['POST'])
 def add_student():
     if request.method == 'POST':
@@ -51,6 +67,7 @@ def add_student():
             return jsonify({"message": "Invalid parameters"}), 400
 
         student = data['student']
+        print(student)
 
         with Session() as session:
             student_obj = Student(
@@ -59,9 +76,14 @@ def add_student():
                 email=student['email'],
                 phone=student['phone'], date_of_birth=student['date_of_birth'], address=student['address'], department_id=student['department_id'], enrollment_date=student['enrollment_date'], status=student['status']
             )
+            # enrollment_obj = Enrollment(
+            #     student_id=student_obj.student_id,
+            #     course_id=student['course_id'],
+            #     enrollment_date=student['enrollment_date']
+            # )
             try:
-                session.add(student_obj)
-                session.commit()
+                # session.add(student_obj)
+                # session.commit()
                 return jsonify({"message": "Student added successfully"}), 200
             except Exception as e:
                 session.rollback()

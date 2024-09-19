@@ -14,7 +14,12 @@ import axios, { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { baseUrl, findAge } from "../data/utils";
-import { StudentType, Department, NullFunction } from "../TypeHints";
+import {
+  StudentType,
+  Department,
+  NullFunction,
+  CourseType,
+} from "../TypeHints";
 
 interface StudentFormProps {
   isOpen: NullFunction;
@@ -27,49 +32,9 @@ export default function AddStudentForm({
   onClose,
   onOpenChange,
 }: StudentFormProps) {
-  // Genders list
-  const genders = [
-    { key: "Male", label: "Male" },
-    { key: "Female", label: "Female" },
-  ];
-
-  // Departments list
-  const [departments, setDepartments] = useState<Department[]>([
-    {
-      key: "",
-      label: "",
-    },
-  ]);
-
-  // Fetch departments from database
-  const fetchDepartments = async () => {
-    try {
-      const response: { data: { departments: Department[] } } = await axios.get(
-        baseUrl + "/departments/all",
-      );
-      if (response?.data?.departments) {
-        setDepartments(response.data.departments);
-      }
-    } catch (err: { response: { data: { message: string } } }) {
-      if (axios.isAxiosError(err)) {
-        toast.error(
-          err?.response?.data?.message || "Unable to get departments list!",
-        );
-      } else {
-        toast.error("An unexptected error occured. Please try again later.");
-      }
-    }
-  };
-
-  // Fetch departments as soon as page loads
-  useEffect(() => {
-    fetchDepartments();
-  }, []);
-
   // Student details from form
   const [student, setStudent] = useState<StudentType>({
     id: "",
-    // primary_key: "",
     first_name: "",
     last_name: "",
     gender: "",
@@ -82,7 +47,140 @@ export default function AddStudentForm({
     department: "",
     enrollment_date: "",
     status: "pending",
+    courses: [""],
+    courses_id: [""],
   });
+
+  // Genders list
+  const genders = [
+    { key: "Male", label: "Male" },
+    { key: "Female", label: "Female" },
+  ];
+
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+
+  // Departments list
+  const [departments, setDepartments] = useState<Department[]>([
+    {
+      key: "",
+      label: "",
+    },
+  ]);
+
+  // Course list
+  const [courses, setCourses] = useState<{ key: string; label: string }[]>([
+    {
+      key: "",
+      label: "",
+    },
+  ]);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get(baseUrl + "/departments/all");
+      if (response?.data?.departments) {
+        setDepartments(response.data.departments);
+      }
+    } catch (err) {
+      if (isAxiosError(err)) {
+        toast.error("Unable to get departments list.");
+      } else {
+        toast.error("Unexpected error occurred. Please try again later.");
+      }
+    }
+  };
+
+  const fetchCourses = async (departmentId: string) => {
+    try {
+      // Fetch all courses in respective department
+      const response: { data: { courses: CourseType[] } } = await axios.get(
+        `${baseUrl}/courses/by-department`,
+        { params: { department_id: departmentId } },
+      );
+      // If successful in getting departments, set variable value.
+      if (response?.data?.courses) {
+        const coursesList = response.data.courses.map((course) => ({
+          key: course.id,
+          label: course.course_name,
+        }));
+        setCourses(coursesList);
+      }
+    } catch (err) {
+      if (isAxiosError(err)) {
+        toast.error("Error occurred fetching courses records");
+      } else {
+        toast.error(
+          "Unexpected error occurred while fetching courses records. Please try again later.",
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const handleDepartmentChange = async (value: string) => {
+    setSelectedDepartment(value);
+    setSelectedCourses("");
+    setCourses([]);
+
+    // Update department id and name in student details
+    // setAttendance((prev) => ({
+    //   ...prev,
+    //   department_id: value,
+    //   department: departments.find((dept) => dept.key === value)?.label || "",
+    //   course_id: "",
+    //   course: "",
+    // }));
+    setStudent((prev) => ({
+      ...prev,
+      department_id: value,
+      department: departments.find((dept) => dept.key === value)?.label || "",
+      courses: [""],
+      courses_id: [""],
+    }));
+    await fetchCourses(value);
+  };
+
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const values = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value,
+    );
+    setSelectedCourses(values);
+
+    // Update course name in student details
+    setStudent((prev) => ({
+      ...prev,
+      courses_id: values,
+      courses: values.map(
+        (courseKey) =>
+          courses.find((course) => course.key === courseKey)?.label || "",
+      ),
+    }));
+  };
+
+  // const handleCourseChange = (values: string[]) => {
+  //   setSelectedCourses(values);
+
+  //   // Update course name in student details
+  //   setStudent((prev) => ({
+  //     ...prev,
+  //     courses_id: values,
+  //     // course: courses.find((course) => course.key === value)?.label || "",
+  //     courses: values.map(
+  //       (courseKey) =>
+  //         courses.find((course) => course.key === courseKey)?.label || "",
+  //     ),
+  //   }));
+  // };
+
+  // Fetch departments as soon as page loads
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
 
   const handleAddStudentSubmit = async () => {
     // e: React.FormEvent<HTMLFormElement>,
@@ -152,6 +250,7 @@ export default function AddStudentForm({
                       />
                     )}
                   </div> */}
+                  <p className="col-span-6 text-base">Personal details:</p>
                   <Input
                     isRequired
                     required
@@ -249,24 +348,20 @@ export default function AddStudentForm({
                     }
                     labelPlacement="inside"
                   />
-                  <Select
-                    isRequired
-                    required
-                    label="Department"
-                    className="max-w-xs col-span-2"
-                    defaultSelectedKeys={[student.department_id]}
+                  <Input
+                    className="col-span-4"
+                    type="none"
+                    maxLength={500}
+                    label="Address"
+                    defaultValue={student.address}
                     onChange={(e) =>
                       setStudent((prev: StudentType) => {
-                        return { ...prev, department_id: e.target.value };
+                        return { ...prev, address: e.target.value };
                       })
                     }
-                  >
-                    {departments.map((department) => (
-                      <SelectItem key={department.key}>
-                        {department.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                    labelPlacement="inside"
+                  />
+                  <p className="col-span-6 text-base">Academic details:</p>
                   <Input
                     className="col-span-2"
                     isRequired
@@ -281,19 +376,64 @@ export default function AddStudentForm({
                     }
                     labelPlacement="inside"
                   />
-                  <Input
-                    className="col-span-6"
-                    type="none"
-                    maxLength={500}
-                    label="Address"
-                    defaultValue={student.address}
+                  {/* <Select
+                    isRequired
+                    required
+                    label="Select Department"
+                    className="max-w-xs col-span-2"
+                    defaultSelectedKeys={[student.department_id]}
                     onChange={(e) =>
                       setStudent((prev: StudentType) => {
-                        return { ...prev, address: e.target.value };
+                        return { ...prev, department_id: e.target.value };
                       })
                     }
-                    labelPlacement="inside"
-                  />
+                  >
+                    {departments.map((department) => (
+                      <SelectItem key={department.key}>
+                        {department.label}
+                      </SelectItem>
+                    ))}
+                  </Select> */}
+                  <Select
+                    isRequired
+                    label="Select Department"
+                    className="max-w-xs col-span-2"
+                    value={selectedDepartment}
+                    onChange={(e) => handleDepartmentChange(e.target.value)}
+                  >
+                    {departments.map((department) => (
+                      <SelectItem key={department.key} value={department.key}>
+                        {department.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+
+                  {selectedDepartment && (
+                    <Select
+                      isRequired
+                      selectionMode="multiple"
+                      label="Select Course"
+                      className="max-w-xs col-span-2"
+                      defaultSelectedKeys={"all"}
+                      value={selectedCourses}
+                      // onChange={(values) => handleCourseChange(values)}
+                      onSelectionChange={(keys) =>
+                        handleCourseChange({
+                          target: {
+                            selectedOptions: Array.from(keys).map((k) => ({
+                              value: k,
+                            })),
+                          },
+                        } as any)
+                      }
+                    >
+                      {courses.map((course) => (
+                        <SelectItem key={course.key} value={course.key}>
+                          {course.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  )}
                 </div>
               </ModalBody>
               <ModalFooter>

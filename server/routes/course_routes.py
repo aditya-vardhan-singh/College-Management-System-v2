@@ -38,6 +38,40 @@ def get_courses():
             session.close()
 
 
+@bp.route('/by-department', methods=['GET'])
+def get_courses_by_department_id():
+    if request.method == 'GET':
+        if 'department_id' not in request.args:
+            print("Invalid paramter request")
+            return jsonify({"message": "Invalid paramter request"}), 400
+
+        department_id = request.args.get('department_id')
+
+        session = Session()
+        try:
+            courses = session.query(Course).filter(Course.department_id == department_id).limit(100).all()
+            if courses is None:
+                return jsonify({"message": "No records found"}), 400
+            else:
+                courses_list = [
+                    {
+                        "id": course.course_id,
+                        "course_name": course.course_name,
+                        "course_code": course.course_code,
+                        "credits": course.credits,
+                        "department_id": course.department_id,
+                        "department": course.department.department_name,
+                    }
+                    for course in courses if course.is_active
+                ]
+                return jsonify({"courses": courses_list}), 200
+        except Exception as e:
+            session.rollback()
+            return jsonify({"message": "Error getting course records"}), 500
+        finally:
+            session.close()
+
+
 @bp.route('/add', methods=['POST'])
 def add_course():
     if request.method == 'POST':

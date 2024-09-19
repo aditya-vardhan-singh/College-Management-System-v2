@@ -7,6 +7,12 @@ export interface NullFunction {
   (): null;
 }
 
+export interface StudentListType {
+  id: string;
+  name: string;
+  date_of_birth: string;
+}
+
 export interface StudentType {
   id: string;
   first_name: string;
@@ -21,6 +27,8 @@ export interface StudentType {
   department: string;
   enrollment_date: string;
   status: string;
+  courses: string[];
+  courses_id: string[];
 }
 
 export interface FacultyType {
@@ -39,17 +47,12 @@ export interface FacultyType {
 }
 
 export interface AttendanceType {
-  id: string;
-  student: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    department: string;
-    department_id: string;
-  };
+  department: string;
+  department_id: string;
   course: string;
+  course_id: string;
   attendance_date: string;
-  status: string;
+  student_ids: string[];
 }
 
 export interface CourseType {
