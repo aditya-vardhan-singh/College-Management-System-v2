@@ -67,6 +67,7 @@ def get_courses_by_department_id():
                 return jsonify({"courses": courses_list}), 200
         except Exception as e:
             session.rollback()
+            print("Error getting course records: ", str(e))
             return jsonify({"message": "Error getting course records"}), 500
         finally:
             session.close()

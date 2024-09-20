@@ -42,52 +42,42 @@ export default function AttendanceList({
   const [selectedKeys, setSelectedKeys] = React.useState(new Set(["2"]));
   const [studentList, setStudentList] = useState<StudentListType[]>([
     {
-      id: "1",
-      name: "Tony Reichert",
-      date_of_birth: "CEO",
-    },
-    {
-      id: "2",
-      name: "Tony Reichert",
-      date_of_birth: "CEO",
-    },
-    {
-      id: "3",
-      name: "Tony Reichert",
-      date_of_birth: "CEO",
-    },
-    {
-      id: "4",
-      name: "Tony Reichert",
-      date_of_birth: "CEO",
+      id: "",
+      name: "",
+      date_of_birth: "",
     },
   ]);
 
-  const fetchStudentsList = () => {
-    try {
-      const response = axios.get(`${baseUrl}/students/get-list`, {
-        params: { course_id: course_id },
-      });
-      if (response?.data?.student_list) {
-        setStudentList(response?.data?.student_list);
-      } else {
-        toast.error("Invalid response paramaters");
-      }
-    } catch (err) {
-      if (isAxiosError(err)) {
-        toast.error(
-          err?.response?.data?.message ||
-            "Error occured fetching student records!",
-        );
-      } else {
-        toast.error("Unexpected error occured while getting student records");
-      }
-    }
-  };
-
   useEffect(() => {
+    const fetchStudentsList = async () => {
+      try {
+        const response: {
+          data: {
+            student_list: { id: string; name: string; date_of_birth: string }[];
+          };
+        } = await axios.get(`${baseUrl}/enrollments/student-by-course`, {
+          params: { course_id: course_id },
+        });
+        console.log(response);
+        if (response?.data?.student_list) {
+          setStudentList(response?.data?.student_list);
+        } else {
+          toast.error("Invalid received paramaters");
+        }
+      } catch (err) {
+        if (isAxiosError(err)) {
+          toast.error(
+            err?.response?.data?.message ||
+              "Error occured fetching student records!",
+          );
+        } else {
+          toast.error("Unexpected error occured while getting student records");
+        }
+      }
+    };
+
     fetchStudentsList();
-  }, []);
+  }, [course_id]);
 
   useEffect(() => {
     sendStudentListToParent([...selectedKeys]);

@@ -12,13 +12,14 @@ CORS(app)
 
 ### ROUTING ###
 
-from routes import student_routes, department_routes, faculty_routes, attendance_routes, course_routes
+from routes import student_routes, department_routes, faculty_routes, attendance_routes, course_routes, enrollment_routes
 
 app.register_blueprint(student_routes.bp)
 app.register_blueprint(department_routes.bp)
 app.register_blueprint(faculty_routes.bp)
 app.register_blueprint(attendance_routes.bp)
 app.register_blueprint(course_routes.bp)
+app.register_blueprint(enrollment_routes.bp)
 
 
 ### START SERVER ###

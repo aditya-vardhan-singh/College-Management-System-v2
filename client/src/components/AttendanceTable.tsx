@@ -349,11 +349,10 @@ export default function AttendanceTable() {
               className="bg-transparent outline-none text-default-400 text-small border-0"
               style={{ boxShadow: "none" }}
               onChange={onRowsPerPageChange}
+              value={10}
             >
               <option value="5">5</option>
-              <option value="10" selected>
-                10
-              </option>
+              <option value="10">10</option>
               <option value="40">40</option>
               <option value="70">70</option>
             </select>

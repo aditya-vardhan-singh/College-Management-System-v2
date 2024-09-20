@@ -63,3 +63,8 @@ export interface CourseType {
   department_id: string;
   department: string;
 }
+
+export interface Key {
+  key: string;
+  label: string;
+}

@@ -1,4 +1,5 @@
 /* Imports */
+
 import {
   Button,
   Input,
@@ -9,6 +10,7 @@ import {
   ModalHeader,
   Select,
   SelectItem,
+  Selection,
 } from "@nextui-org/react";
 import axios, { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
@@ -19,6 +21,7 @@ import {
   Department,
   NullFunction,
   CourseType,
+  Key,
 } from "../TypeHints";
 
 interface StudentFormProps {
@@ -46,9 +49,9 @@ export default function AddStudentForm({
     department_id: "",
     department: "",
     enrollment_date: "",
-    status: "pending",
-    courses: [""],
-    courses_id: [""],
+    status: "admitted",
+    courses: [],
+    courses_id: [],
   });
 
   // Genders list
@@ -57,16 +60,16 @@ export default function AddStudentForm({
     { key: "Female", label: "Female" },
   ];
 
-  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
-  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-
   // Departments list
-  const [departments, setDepartments] = useState<Department[]>([
+  const [departments, setDepartments] = useState<Key[]>([
     {
       key: "",
       label: "",
     },
   ]);
+  const [selectedDepartment, setSelectedDepartment] = useState<Selection>(
+    new Set([""]),
+  );
 
   // Course list
   const [courses, setCourses] = useState<{ key: string; label: string }[]>([
@@ -75,6 +78,9 @@ export default function AddStudentForm({
       label: "",
     },
   ]);
+  const [selectedCourses, setSelectedCourses] = useState<Selection>(
+    new Set([""]),
+  );
 
   const fetchDepartments = async () => {
     try {
@@ -93,18 +99,23 @@ export default function AddStudentForm({
 
   const fetchCourses = async (departmentId: string) => {
     try {
-      // Fetch all courses in respective department
       const response: { data: { courses: CourseType[] } } = await axios.get(
         `${baseUrl}/courses/by-department`,
         { params: { department_id: departmentId } },
       );
-      // If successful in getting departments, set variable value.
       if (response?.data?.courses) {
         const coursesList = response.data.courses.map((course) => ({
           key: course.id,
           label: course.course_name,
         }));
         setCourses(coursesList);
+
+        // Update student details with all courses
+        setStudent((prev) => ({
+          ...prev,
+          // courses: coursesList.map((value) => value.label),
+          courses_id: coursesList.map((value) => `${value.key}`),
+        }));
       }
     } catch (err) {
       if (isAxiosError(err)) {
@@ -117,63 +128,29 @@ export default function AddStudentForm({
     }
   };
 
-  useEffect(() => {
-    fetchDepartments();
-  }, []);
-
-  const handleDepartmentChange = async (value: string) => {
-    setSelectedDepartment(value);
-    setSelectedCourses("");
-    setCourses([]);
-
-    // Update department id and name in student details
-    // setAttendance((prev) => ({
-    //   ...prev,
-    //   department_id: value,
-    //   department: departments.find((dept) => dept.key === value)?.label || "",
-    //   course_id: "",
-    //   course: "",
-    // }));
-    setStudent((prev) => ({
-      ...prev,
-      department_id: value,
-      department: departments.find((dept) => dept.key === value)?.label || "",
-      courses: [""],
-      courses_id: [""],
-    }));
-    await fetchCourses(value);
-  };
-
-  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const values = Array.from(
-      e.target.selectedOptions,
-      (option) => option.value,
-    );
-    setSelectedCourses(values);
-
-    // Update course name in student details
-    setStudent((prev) => ({
-      ...prev,
-      courses_id: values,
-      courses: values.map(
-        (courseKey) =>
-          courses.find((course) => course.key === courseKey)?.label || "",
-      ),
-    }));
-  };
-
-  // const handleCourseChange = (values: string[]) => {
-  //   setSelectedCourses(values);
-
-  //   // Update course name in student details
+  // const handleDepartmentChange = async (
+  //   e: React.ChangeEvent<HTMLSelectElement>,
+  // ) => {
+  //   const value = e.target.value;
   //   setStudent((prev) => ({
   //     ...prev,
-  //     courses_id: values,
-  //     // course: courses.find((course) => course.key === value)?.label || "",
-  //     courses: values.map(
-  //       (courseKey) =>
-  //         courses.find((course) => course.key === courseKey)?.label || "",
-  //     ),
+  //     department_id: value,
+  //     department: departments.find((dept) => dept.key === value)?.label || "",
+  //   }));
+  //   await fetchCourses(value);
+  // };
+
+  // const handleCourseChange = (keys: Set<Key>) => {
+  //   setSelectedCourses(keys);
+  //   const selectedCourseIds = Array.from(keys) as string[];
+  //   const selectedCourseNames = selectedCourseIds.map(
+  //     (id) => courses.find((course) => course.key === id)?.label || "",
+  //   );
+
+  //   setStudent((prev) => ({
+  //     ...prev,
+  //     courses_id: selectedCourseIds,
+  //     courses: selectedCourseNames,
   //   }));
   // };
 
@@ -182,17 +159,80 @@ export default function AddStudentForm({
     fetchDepartments();
   }, []);
 
-  const handleAddStudentSubmit = async () => {
-    // e: React.FormEvent<HTMLFormElement>,
-    // e.preventDefault();
+  // useEffect(() => {
+  //   const getSelectedDepartment = () => {
+  //     // Convert the Set to an array and get the first (and only) element
+  //     const selectedKey = Array.from(selectedDepartment)[0];
+
+  //     // Find the department object in the departments array that matches the selected key
+  //     const selected = departments.find((dept) => dept.key === selectedKey);
+
+  //     // Return the selected department, or null if not found
+  //     return selected || null;
+  //   };
+  //   setStudent((prev) => ({
+  //     ...prev,
+  //     department_id: getSelectedDepartment?.key,
+  //     department: getSelectedDepartment?.label,
+  //   }));
+  //   console.log(student.department_id);
+  // }, [departments, selectedDepartment, setSelectedDepartment]);
+
+  // useEffect(() => {
+  //   const getSelectedCoursesKeys = () => {
+  //     // Convert the Set to an array and get the first (and only) element
+  //     const selectedKeys = Array.from(selectedDepartment);
+
+  //     // Find the department object in the departments array that matches the selected key
+  //     const selected: Key[] | undefined = [];
+  //     selectedKeys.forEach((key) => {
+  //       selected.push(courses.find((course) => course.key === key)?.key);
+  //     });
+
+  //     // Return the selected department, or null if not found
+  //     return selected || null;
+  //   };
+  //   const getSelectedCoursesLabels = () => {
+  //     // Convert the Set to an array and get the first (and only) element
+  //     const selectedKeys = Array.from(selectedDepartment);
+
+  //     // Find the department object in the departments array that matches the selected key
+  //     const selected: Key[] | undefined = [];
+  //     selectedKeys.forEach((key) => {
+  //       selected.push(courses.find((course) => course.key === key)?.label);
+  //     });
+
+  //     // Return the selected department, or null if not found
+  //     return selected || null;
+  //   };
+  //   setStudent((prev) => ({
+  //     ...prev,
+  //     courses_id: getSelectedCoursesKeys,
+  //     courses: getSelectedCoursesLabels,
+  //   }));
+  // }, [departments, selectedDepartment, setSelectedDepartment]);
+
+  const handleAddStudentSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
+    e.preventDefault();
 
     // Set department name from department id
-    const getDepartment = departments.filter((dept) => {
+    const getDepartmentLabel = departments.filter((dept) => {
       return dept.key == student.department_id;
+    })[0].label;
+
+    if (getDepartmentLabel.length > 0) {
+      student.department = getDepartmentLabel;
+    }
+
+    // Set courses name from course ids
+    const getCourseLabels = student.courses_id.map((course_id) => {
+      return courses.filter((course) => course.key == course_id)[0].label;
     });
 
-    if (getDepartment.length > 0) {
-      student.department = getDepartment[0].label;
+    if (getCourseLabels.length > 0) {
+      student.courses = getCourseLabels;
     }
 
     // Derive age from date of birth
@@ -237,19 +277,6 @@ export default function AddStudentForm({
               <ModalBody>
                 <Toaster richColors position="bottom-center" />
                 <div className="grid grid-cols-6 gap-4">
-                  {/* <div className="col-span-6">
-                    {student.id !== "" && (
-                      <Input
-                        name="id"
-                        isReadOnly
-                        type="none"
-                        label="Student ID"
-                        labelPlacement="inside"
-                        defaultValue={student.id}
-                        style={{ borderWidth: 0, boxShadow: "none" }}
-                      />
-                    )}
-                  </div> */}
                   <p className="col-span-6 text-base">Personal details:</p>
                   <Input
                     isRequired
@@ -266,7 +293,6 @@ export default function AddStudentForm({
                         return { ...prev, first_name: e.target.value };
                       })
                     }
-                    // style={{ borderWidth: 0, boxShadow: "none" }}
                   />
                   <Input
                     isRequired
@@ -297,7 +323,9 @@ export default function AddStudentForm({
                     }
                   >
                     {genders.map((gender) => (
-                      <SelectItem key={gender.key}>{gender.label}</SelectItem>
+                      <SelectItem key={gender.key} textValue={gender.label}>
+                        {gender.label}
+                      </SelectItem>
                     ))}
                   </Select>
                   <Input
@@ -350,7 +378,7 @@ export default function AddStudentForm({
                   />
                   <Input
                     className="col-span-4"
-                    type="none"
+                    type="text"
                     maxLength={500}
                     label="Address"
                     defaultValue={student.address}
@@ -376,61 +404,51 @@ export default function AddStudentForm({
                     }
                     labelPlacement="inside"
                   />
-                  {/* <Select
+                  <Select
                     isRequired
                     required
                     label="Select Department"
                     className="max-w-xs col-span-2"
-                    defaultSelectedKeys={[student.department_id]}
-                    onChange={(e) =>
-                      setStudent((prev: StudentType) => {
-                        return { ...prev, department_id: e.target.value };
-                      })
+                    selectedKeys={
+                      student.department_id ? [student.department_id] : []
                     }
+                    onSelectionChange={async (keys) => {
+                      const selectedKeys = Array.from(keys)[0];
+                      if (typeof selectedKeys === "string") {
+                        setStudent((prev) => ({
+                          ...prev,
+                          department_id: selectedKeys,
+                        }));
+                        await fetchCourses(selectedKeys);
+                      }
+                    }}
                   >
                     {departments.map((department) => (
                       <SelectItem key={department.key}>
                         {department.label}
                       </SelectItem>
                     ))}
-                  </Select> */}
-                  <Select
-                    isRequired
-                    label="Select Department"
-                    className="max-w-xs col-span-2"
-                    value={selectedDepartment}
-                    onChange={(e) => handleDepartmentChange(e.target.value)}
-                  >
-                    {departments.map((department) => (
-                      <SelectItem key={department.key} value={department.key}>
-                        {department.label}
-                      </SelectItem>
-                    ))}
                   </Select>
 
-                  {selectedDepartment && (
+                  {student.department_id && (
                     <Select
                       isRequired
+                      required
                       selectionMode="multiple"
                       label="Select Course"
                       className="max-w-xs col-span-2"
-                      defaultSelectedKeys={"all"}
-                      value={selectedCourses}
-                      // onChange={(values) => handleCourseChange(values)}
-                      onSelectionChange={(keys) =>
-                        handleCourseChange({
-                          target: {
-                            selectedOptions: Array.from(keys).map((k) => ({
-                              value: k,
-                            })),
-                          },
-                        } as any)
-                      }
+                      selectedKeys={student.courses_id}
+                      onSelectionChange={(keys) => {
+                        const selectedKeys = Array.from(keys);
+                        console.log(selectedKeys);
+                        setStudent((prev) => ({
+                          ...prev,
+                          courses_id: selectedKeys as string[],
+                        }));
+                      }}
                     >
                       {courses.map((course) => (
-                        <SelectItem key={course.key} value={course.key}>
-                          {course.label}
-                        </SelectItem>
+                        <SelectItem key={course.key}>{course.label}</SelectItem>
                       ))}
                     </Select>
                   )}

@@ -72,7 +72,7 @@ export default function AddAttendanceForm({
       // If successful in getting departments, set variable value.
       if (response?.data?.courses) {
         const coursesList = response.data.courses.map((course) => ({
-          key: course.course_code,
+          key: course.id,
           label: course.course_name,
         }));
         setCourses(coursesList);
@@ -124,6 +124,7 @@ export default function AddAttendanceForm({
   ) => {
     e.preventDefault();
     try {
+      console.log(attendance.student_ids);
       const response = await axios.post(`${baseUrl}/attendances/add`, {
         attendance,
       });

@@ -70,20 +70,23 @@ def add_student():
         print(student)
 
         with Session() as session:
-            student_obj = Student(
-                first_name=student['first_name'], last_name=student['last_name'],
-                gender=student['gender'],
-                email=student['email'],
-                phone=student['phone'], date_of_birth=student['date_of_birth'], address=student['address'], department_id=student['department_id'], enrollment_date=student['enrollment_date'], status=student['status']
-            )
-            # enrollment_obj = Enrollment(
-            #     student_id=student_obj.student_id,
-            #     course_id=student['course_id'],
-            #     enrollment_date=student['enrollment_date']
-            # )
             try:
-                # session.add(student_obj)
-                # session.commit()
+                student_obj = Student(
+                    first_name=student['first_name'], last_name=student['last_name'],
+                    gender=student['gender'],
+                    email=student['email'],
+                    phone=student['phone'], date_of_birth=student['date_of_birth'], address=student['address'], department_id=student['department_id'], enrollment_date=student['enrollment_date'], status=student['status']
+                )
+                session.add(student_obj)
+                session.flush()
+                for course_id in student['courses_id']:
+                    enrollment_obj = Enrollment(
+                        student_id=student_obj.student_id,
+                        course_id=course_id,
+                        enrollment_date=student['enrollment_date']
+                    )
+                    session.add(enrollment_obj)
+                session.commit()
                 return jsonify({"message": "Student added successfully"}), 200
             except Exception as e:
                 session.rollback()

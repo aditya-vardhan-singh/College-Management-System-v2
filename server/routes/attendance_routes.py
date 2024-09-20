@@ -53,27 +53,29 @@ def add_attendance():
     if request.method == 'POST':
         data = request.get_json()
         if 'attendance' not in data:
+            print("Invalid params")
             return jsonify({"message": "Invalid parameters"}), 400
 
         attendance = data['attendance']
 
-        if 'date' not in attendance or 'students' not in attendance or 'course_id' not in attendance:
+        if 'attendance_date' not in attendance or 'student_ids' not in attendance or 'course_id' not in attendance:
+            print("Invalid attendance params")
             return jsonify({"message": "Invalid attendance parameters"}), 400
 
-        date = attendance['date']
-        students_list = attendance['students']
+        attendance_date = attendance['attendance_date']
+        students_list = attendance['student_ids']
         course_id = attendance['course_id']
 
         with Session() as session:
             try:
                 for student in students_list:
-                    is_duplicate = session.query(Attendance).filter(and_(Attendance.student_id == student.id, Attendance.attendance_date == date)).first()
+                    is_duplicate = session.query(Attendance).filter(and_(Attendance.student_id == student.id, Attendance.attendance_date == attendance_date)).first()
 
                     if not is_duplicate:
                         attd = Attendance(
                             student_id=student['id'],
                             course_id=course_id,
-                            attendance_date=date,
+                            attendance_date=attendance_date,
                             status=student['status']
                         )
                         session.add(attd)
@@ -82,7 +84,8 @@ def add_attendance():
                 return jsonify({"message": "Attendance marked successfully"}), 200
             except Exception as e:
                 session.rollback()
-                return jsonify({"message": "Failed to mark attendance"}), 500
+                print("Error occured while marking attendance:", str(e))
+                return jsonify({"message": "An error occured while marking attendance"}), 500
 
 
 @bp.route('/delete', methods=['DELETE'])
