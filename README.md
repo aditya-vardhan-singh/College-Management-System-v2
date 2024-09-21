@@ -4,16 +4,61 @@ A streamlined solution for managing college operations efficiently. Our web app 
 
 # Preview (Screenshots)
 
-### Dashboard page
+### Dashboard
 
-![Dashboard page](./assets/app_screenshots/Dashboard%20page.png)
+![Dashboard page](./assets/app_screenshots/Dashboard.png)
 
-### Student's page
+### Student
 
-![Student page](./assets/app_screenshots/Student's%20page.png)
+Student's list/table:
 
-![View Student Mode](./assets/app_screenshots/View%20Student%20Mode.png)
+![Student page](./assets/app_screenshots/StudentTable.png)
 
-![Filter Student's Table](./assets/app_screenshots/FIlter%20table.png)
+Add student form:
 
-![Search Student's Table](./assets/app_screenshots/Search%20Student's%20Table.png)
+![Student add form](./assets/app_screenshots/StudentAddForm.png)
+![Student add form 2](./assets/app_screenshots/StudentAddForm2.png)
+
+View student details:
+
+![View Student Preview](./assets/app_screenshots/StudentDetailsPreview.png)
+
+Update student details:
+
+![Update Student Preview](./assets/app_screenshots/StudentUpdateForm.png)
+
+Delete student details:
+
+![Delete Student Form](./assets/app_screenshots/StudentDeletePreview.png)
+
+### Attendance
+
+Attendance records/list/table
+
+![attendance records preview](./assets/app_screenshots/Attendance.png)
+
+Mark attendance:
+
+![mark attendance of students](./assets/app_screenshots/AttendanceAddForm.png)
+
+### Class
+
+Class records/list/table
+
+![class records preview](./assets/app_screenshots/ClassTable.png)
+
+![add class form preview](./assets/app_screenshots/AddClassroomForm.png)
+
+### Faculty
+
+Faculty records:
+
+![faculty records preview](./assets/app_screenshots/Faculty.png)
+
+Adding a new faculty:
+
+![add faculty preview](./assets/app_screenshots/FacultyAddForm.png)
+
+### Course
+
+![course preview](./assets/app_screenshots/Course.png)

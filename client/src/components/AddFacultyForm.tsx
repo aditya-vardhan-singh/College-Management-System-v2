@@ -270,7 +270,7 @@ export default function AddFacultyForm({
                     isRequired
                     required
                     type="date"
-                    label="Enrollment Date"
+                    label="Hire Date"
                     defaultValue={faculty.hire_date}
                     onChange={(e) =>
                       setFaculty((prev: FacultyType) => {

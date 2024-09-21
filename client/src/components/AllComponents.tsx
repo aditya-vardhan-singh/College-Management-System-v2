@@ -12,9 +12,10 @@ import AddStudentForm from "./AddStudentForm";
 import UpdateStudentForm from "./UpdateStudentForm";
 import AddFacultyForm from "./AddFacultyForm";
 import UpdateFacultyForm from "./UpdateFacultyForm";
+import AddCourseForm from "./AddCourseForm";
 import AddAttendanceForm from "./AddAttendanceForm";
 import UpdateAttendanceForm from "./UpdateAttendanceForm";
-import AddCourseForm from "./AddCourseForm";
+import AddClassroomForm from "./AddClassroomForm";
 import UpdateCourseForm from "./UpdateCourseForm";
 import AttendanceList from "./AttendanceList";
 
@@ -23,6 +24,7 @@ export {
   StudentTable,
   FacultyTable,
   ClassTable,
+  AddCourseForm,
   CourseTable,
   ResultTable,
   ExamTable,
@@ -35,7 +37,7 @@ export {
   UpdateFacultyForm,
   AddAttendanceForm,
   UpdateAttendanceForm,
-  AddCourseForm,
+  AddClassroomForm,
   UpdateCourseForm,
   AttendanceList,
 };

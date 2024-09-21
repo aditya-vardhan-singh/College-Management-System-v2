@@ -27,7 +27,7 @@ import { SearchIcon } from "../assets/SearchIcon";
 import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
 import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
-import { AddCourseForm } from "./AllComponents";
+import { AddClassroomForm } from "./AllComponents";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
@@ -509,7 +509,7 @@ export default function ClassTable() {
           </Modal>
         )}
         {currentOption === "Add" && (
-          <AddCourseForm
+          <AddClassroomForm
             isOpen={isOpen}
             onClose={onClose}
             onOpenChange={onOpenChange}
