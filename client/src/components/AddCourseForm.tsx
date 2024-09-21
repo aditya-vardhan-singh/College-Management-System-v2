@@ -14,87 +14,130 @@ import axios, { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { baseUrl } from "../data/utils";
-import { CourseType, Department, NullFunction } from "../TypeHints";
+import {
+  ClassType,
+  NullFunction,
+  Key,
+  CourseType,
+  Department,
+  FacultyType,
+} from "../TypeHints";
 
-interface StudentFormProps {
+interface ClassFormProps {
   isOpen: NullFunction;
   onClose: NullFunction;
   onOpenChange: NullFunction;
 }
 
-export default function AddCourseForm({
+export default function AddClassForm({
   isOpen,
   onClose,
   onOpenChange,
-}: StudentFormProps) {
-  // Departments list
-  const [departments, setDepartments] = useState<Department[]>([
+}: ClassFormProps) {
+  // Class details from form
+  const [classroom, setClassroom] = useState<ClassType>({
+    id: "",
+    room_number: "",
+    course_id: "",
+    course: "",
+    faculty_id: "",
+    faculty: "",
+    schedule_time: "",
+  });
+  const [courses, setCourses] = useState<Key[]>([
+    {
+      key: "",
+      label: "",
+    },
+  ]);
+  const [faculties, setFaculties] = useState<Key[]>([
     {
       key: "",
       label: "",
     },
   ]);
 
-  // Fetch departments from database
-  const fetchDepartments = async () => {
-    try {
-      const response: { data: { departments: Department[] } } = await axios.get(
-        baseUrl + "/departments/all",
-      );
-      if (response?.data?.departments) {
-        setDepartments(response.data.departments);
-      }
-    } catch (err: { response: { data: { message: string } } }) {
-      if (axios.isAxiosError(err)) {
-        toast.error(
-          err?.response?.data?.message || "Unable to get departments list!",
-        );
-      } else {
-        toast.error("An unexptected error occured. Please try again later.");
-      }
-    }
-  };
-
-  // Fetch departments as soon as page loads
   useEffect(() => {
-    fetchDepartments();
+    const fetchCourses = async () => {
+      try {
+        const response: { data: { users: CourseType[] } } = await axios.get(
+          `${baseUrl}/courses/all`,
+        );
+        if (response?.data?.users) {
+          setCourses(
+            response.data.users.map((course) => ({
+              key: course.id,
+              label: course.course_name,
+            })),
+          );
+        }
+      } catch (err) {
+        if (isAxiosError(err)) {
+          toast.error(
+            err?.response?.data?.message ||
+              "Error occured while fetching courses records",
+          );
+        } else {
+          toast.error("Unexpected error occured. Please try again later.");
+        }
+      }
+    };
+    fetchCourses();
   }, []);
 
-  // Course details from form
-  const [course, setCourse] = useState<CourseType>({
-    id: "",
-    course_name: "",
-    course_code: "",
-    credits: "",
-    department_id: "",
-    department: "",
-  });
+  useEffect(() => {
+    const fetchFaculties = async () => {
+      try {
+        const response: { data: { faculties: FacultyType[] } } =
+          await axios.get(`${baseUrl}/faculties/all`);
+        if (response?.data?.faculties) {
+          setFaculties(
+            response.data.faculties.map((faculty) => ({
+              key: faculty.id,
+              label: `${faculty.first_name} ${faculty.last_name}`,
+            })),
+          );
+        }
+      } catch (err) {
+        if (isAxiosError(err)) {
+          toast.error(
+            err?.response?.data?.message ||
+              "Error occured while fetching faculties records",
+          );
+        } else {
+          toast.error("Unexpected error occured. Please try again later.");
+        }
+      }
+    };
+    fetchFaculties();
+  }, []);
 
-  const handleAddCourseSubmit = async (e: React.FormEvent) => {
+  const handleAddClassroomSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Set department name from department id
-    const getDepartment = departments.filter((dept) => {
-      return dept.key == course.department_id;
-    });
-    if (getDepartment.length > 0) {
-      course.department = getDepartment[0].label;
-    }
+    setClassroom((prev) => ({
+      ...prev,
+      schedule_time: String(classroom.schedule_time),
+    }));
 
-    // API call to store course details in database
+    // API call to store class details in database
     try {
-      const toastID = toast.loading("Adding new course. Please wait.");
-      const response = await axios.post(`${baseUrl}/courses/add`, {
-        course: course,
+      const toastID = toast.loading("Adding new classroom. Please wait.");
+      const response = await axios.post(`${baseUrl}/classes/add`, {
+        classroom: classroom,
       });
       toast.dismiss(toastID);
-      toast.success(response?.data?.message || "New course added successfully");
+      toast.success(
+        response?.data?.message || "New classroom added successfully",
+      );
       setTimeout(() => {
         window.location.reload();
       }, 3 * 1000);
     } catch (err) {
       if (isAxiosError(err)) {
-        toast.error(err?.response?.data?.message || "Error adding new course");
+        toast.error(
+          err?.response?.data?.message || "Error adding new classroom",
+        );
       } else {
         toast.error("An unexpected error occured. Please try later.");
       }
@@ -113,9 +156,9 @@ export default function AddCourseForm({
       >
         <ModalContent>
           {(onClose) => (
-            <form onSubmit={handleAddCourseSubmit}>
+            <form onSubmit={handleAddClassroomSubmit}>
               <ModalHeader className="flex flex-col gap-1">
-                Add a new course
+                Add a new classroom
               </ModalHeader>
               <ModalBody>
                 <Toaster richColors position="bottom-center" />
@@ -123,71 +166,67 @@ export default function AddCourseForm({
                   <Input
                     isRequired
                     required
-                    className="col-span-4"
-                    type="text"
-                    maxLength={50}
-                    autoComplete="course_name"
-                    label="Course Name"
-                    labelPlacement="inside"
-                    value={course.course_name}
-                    onChange={(e) =>
-                      setCourse((prev: CourseType) => {
-                        return { ...prev, course_name: e.target.value };
-                      })
-                    }
-                    // style={{ borderWidth: 0, boxShadow: "none" }}
-                  />
-                  <Input
-                    isRequired
-                    required
                     className="col-span-2"
                     type="text"
                     maxLength={50}
-                    autoComplete="course_code"
-                    label="Course Code"
+                    autoComplete="room_number"
+                    label="Room Number"
                     labelPlacement="inside"
-                    defaultValue={course.course_code}
+                    value={classroom.room_number}
                     onChange={(e) =>
-                      setCourse((prev: CourseType) => {
-                        return { ...prev, course_code: e.target.value };
+                      setClassroom((prev: ClassType) => {
+                        return { ...prev, room_number: e.target.value };
                       })
                     }
                   />
                   <Select
                     isRequired
                     required
-                    label="Department"
+                    label="Faculty"
                     className="max-w-full col-span-4"
-                    defaultSelectedKeys={[course.department_id]}
-                    value={course.department_id}
+                    defaultSelectedKeys={[classroom.faculty_id]}
                     onChange={(e) =>
-                      setCourse((prev: CourseType) => {
-                        return { ...prev, department_id: e.target.value };
+                      setClassroom((prev: ClassType) => {
+                        return { ...prev, faculty_id: e.target.value };
                       })
                     }
                   >
-                    {departments.map((department) => (
-                      <SelectItem key={department.key}>
-                        {department.label}
-                      </SelectItem>
+                    {faculties.map((faculty) => (
+                      <SelectItem key={faculty.key}>{faculty.label}</SelectItem>
                     ))}
                   </Select>
                   <Input
                     isRequired
                     required
                     className="col-span-2"
-                    type="number"
+                    type="time"
                     maxLength={50}
-                    autoComplete="credits"
-                    label="Credits"
+                    autoComplete="schedule_time"
+                    label="Schedule Time"
                     labelPlacement="inside"
-                    defaultValue={course.credits}
+                    defaultValue={classroom.schedule_time}
                     onChange={(e) =>
-                      setCourse((prev: CourseType) => {
-                        return { ...prev, credits: e.target.value };
+                      setClassroom((prev: ClassType) => {
+                        return { ...prev, schedule_time: e.target.value };
                       })
                     }
                   />
+                  <Select
+                    isRequired
+                    required
+                    label="Course"
+                    className="max-w-full col-span-4"
+                    defaultSelectedKeys={[classroom.course_id]}
+                    onChange={(e) =>
+                      setClassroom((prev: ClassType) => {
+                        return { ...prev, course_id: e.target.value };
+                      })
+                    }
+                  >
+                    {courses.map((course) => (
+                      <SelectItem key={course.key}>{course.label}</SelectItem>
+                    ))}
+                  </Select>
                 </div>
               </ModalBody>
               <ModalFooter>

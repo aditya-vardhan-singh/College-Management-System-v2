@@ -55,7 +55,6 @@ const statusColorMap = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
   "first_name",
   "last_name",
   "department",
@@ -109,7 +108,15 @@ export default function AttendanceTable() {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((attendance) =>
-        (attendance.first_name + attendance.last_name)
+        (
+          attendance.first_name +
+          " " +
+          attendance.last_name +
+          " " +
+          attendance.course +
+          " " +
+          attendance.department
+        )
           .toLowerCase()
           .includes(filterValue.toLowerCase()),
       );

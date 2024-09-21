@@ -27,7 +27,7 @@ def get_classroom():
                             "course": classroom.course.course_name,
                             "faculty_id": classroom.faculty_id,
                             "faculty": f'{classroom.faculty.first_name} {classroom.faculty.first_name}',
-                            "schedule_time": classroom.schedule_time,
+                            "schedule_time": str(classroom.schedule_time),
                         }
                         for classroom in classrooms if classroom.is_active
                     ]

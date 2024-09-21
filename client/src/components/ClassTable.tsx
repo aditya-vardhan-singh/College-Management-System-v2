@@ -27,17 +27,17 @@ import { SearchIcon } from "../assets/SearchIcon";
 import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
 import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
-import AddStudentForm from "./AddStudentForm";
-import { ClassType } from "../TypeHints";
+import { AddCourseForm } from "./AllComponents";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "ROOM NUMBER", uid: "first_name", sortable: true },
+  { name: "ROOM NUMBER", uid: "room_number", sortable: true },
   { name: "COURSE ID", uid: "course_id", sortable: true },
-  { name: "COURSE", uid: "last_name", sortable: true },
+  { name: "COURSE", uid: "course", sortable: true },
   { name: "FACULTY ID", uid: "faculty_id", sortable: true },
-  { name: "FACULTY", uid: "age", sortable: true },
-  { name: "SCHEDULE TIME", uid: "gender", sortable: true },
+  { name: "FACULTY", uid: "faculty", sortable: true },
+  { name: "SCHEDULE TIME", uid: "schedule_time", sortable: true },
+  // { name: "ACTIONS", uid: "actions", sortable: true },
 ];
 
 // const statusOptions = [
@@ -58,10 +58,11 @@ const INITIAL_VISIBLE_COLUMNS = [
   "course",
   "faculty",
   "schedule_time",
+  // "actions",
 ];
 
 export default function ClassTable() {
-  const [users, setUsers] = useState<ClassType>([
+  const [users, setUsers] = useState([
     // {
     //   id: "",
     //   room_number: "",
@@ -316,7 +317,14 @@ export default function ClassTable() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
+            <Button
+              color="primary"
+              endContent={<PlusIcon />}
+              onClick={() => {
+                setCurrentOption("Add");
+                onOpen();
+              }}
+            >
               Add New
             </Button>
           </div>
@@ -500,6 +508,13 @@ export default function ClassTable() {
             </ModalContent>
           </Modal>
         )}
+        {currentOption === "Add" && (
+          <AddCourseForm
+            isOpen={isOpen}
+            onClose={onClose}
+            onOpenChange={onOpenChange}
+          />
+        )}
       </>
     );
   };
@@ -508,8 +523,8 @@ export default function ClassTable() {
     axios
       .get(`${baseUrl}/classes/all`)
       .then((response) => {
-        if (response?.data?.classes) {
-          setUsers(response.data.classes);
+        if (response?.data?.classrooms) {
+          setUsers(response.data.classrooms);
         } else {
           toast.error("Invalid response parameters!");
         }
@@ -549,7 +564,7 @@ export default function ClassTable() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No users found"} items={sortedItems}>
+        <TableBody emptyContent={"No records found"} items={sortedItems}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
