@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   Button,
   DatePicker,
+  DateValue,
   Input,
   Modal,
   ModalBody,
@@ -38,12 +39,15 @@ export default function AddAttendanceForm({
   const [courses, setCourses] = useState<{ key: string; label: string }[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [attendanceDate, setAttendanceDate] = useState<DateValue>(
+    today(getLocalTimeZone()),
+  );
   const [attendance, setAttendance] = useState<AttendanceType>({
     department: "",
     department_id: "",
     course: "",
     course_id: "",
-    attendance_date: "",
+    attendance_date: `${today(getLocalTimeZone())}`,
     student_ids: [],
   });
 
@@ -123,8 +127,12 @@ export default function AddAttendanceForm({
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
+
+    // Set attendance date before passing
+    attendance.attendance_date = `${attendanceDate.year}-${attendanceDate.month}-${attendanceDate.day}`;
+
     try {
-      console.log(attendance.student_ids);
+      console.log(attendance);
       const response = await axios.post(`${baseUrl}/attendances/add`, {
         attendance,
       });
@@ -202,11 +210,11 @@ export default function AddAttendanceForm({
                       label="Date"
                       className="max-w-full col-span-2"
                       maxValue={today(getLocalTimeZone())}
-                      defaultValue={today(getLocalTimeZone())}
+                      value={attendanceDate}
+                      onChange={setAttendanceDate}
                     />
                     <div className="col-span-6">
                       <AttendanceList
-                        department_id={attendance.department_id}
                         course_id={attendance.course_id}
                         sendStudentListToParent={handleArrayFromList}
                       />

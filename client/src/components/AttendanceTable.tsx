@@ -30,7 +30,7 @@ import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
 import { AddNoteIcon } from "../assets/AddNoteIcon";
 import { baseUrl, capitalize } from "../data/utils";
 import { AddAttendanceForm, UpdateAttendanceForm } from "./AllComponents";
-import { AttendanceType } from "../TypeHints";
+import { AttendaceListType, AttendanceType } from "../TypeHints";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
@@ -39,8 +39,9 @@ const columns = [
   { name: "LAST NAME", uid: "last_name", sortable: true },
   { name: "DEPARTMENT", uid: "department", sortable: true },
   { name: "COURSE", uid: "course", sortable: true },
-  { name: "DATE", uid: "date", sortable: true },
+  { name: "DATE", uid: "attendance_date", sortable: true },
   { name: "STATUS", uid: "status", sortable: true },
+  // { name: "ACTIONS", uid: "actions", sortable: true },
 ];
 
 const statusOptions = [
@@ -59,24 +60,23 @@ const INITIAL_VISIBLE_COLUMNS = [
   "last_name",
   "department",
   "course",
-  "date",
+  "attendance_date",
   "status",
   "actions",
 ];
 
 export default function AttendanceTable() {
   // All students
-  const [attendances, setAttendances] = React.useState<AttendanceType[]>([
+  const [attendances, setAttendances] = React.useState<AttendaceListType[]>([
     {
       id: "",
-      student: {
-        id: "",
-        first_name: "",
-        last_name: "",
-        department: "",
-        department_id: "",
-      },
+      student_id: "",
+      first_name: "",
+      last_name: "",
+      department: "",
+      department_id: "",
       course: "",
+      course_id: "",
       attendance_date: "",
       status: "",
     },
@@ -108,8 +108,8 @@ export default function AttendanceTable() {
     let filteredUsers = [...attendances];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((exam) =>
-        (exam.student.first_name + exam.student.last_name)
+      filteredUsers = filteredUsers.filter((attendance) =>
+        (attendance.first_name + attendance.last_name)
           .toLowerCase()
           .includes(filterValue.toLowerCase()),
       );
@@ -409,17 +409,7 @@ export default function AttendanceTable() {
         </div>
       </div>
     );
-  }, [
-    selectedKeys,
-    items.length,
-    page,
-    pages,
-    hasSearchFilter,
-    // filteredItems.length,
-    // onNextPage,
-    // onPreviousPage,
-    // attendances.length,
-  ]);
+  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   const handleDeleteUser = () => {
     async function deleteUser() {
@@ -594,8 +584,8 @@ export default function AttendanceTable() {
     axios
       .get(`${baseUrl}/attendances/all`)
       .then((response) => {
-        if (response?.data?.faculties) {
-          setAttendances(response.data.faculties);
+        if (response?.data?.attendances) {
+          setAttendances(response.data.attendances);
         } else {
           toast.error("Invalid response parameters!");
         }

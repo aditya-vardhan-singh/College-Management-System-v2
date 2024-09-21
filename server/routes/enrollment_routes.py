@@ -28,14 +28,12 @@ def get_attendances():
 
                 student_list = []
                 for student in students:
-                    print(student.student.first_name)
                     student_list.append({
                         "id": student.student_id,
                         "name": f'{student.student.first_name} {student.student.last_name}',
                         "date_of_birth": student.student.date_of_birth
                     })
 
-                print(student_list)
                 return jsonify({"student_list": student_list}), 200
             except Exception as e:
                 session.rollback()

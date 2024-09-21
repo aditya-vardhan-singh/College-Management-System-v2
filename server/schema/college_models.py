@@ -117,6 +117,7 @@ class Classroom(Base):
     course_id: Mapped[int] = mapped_column(ForeignKey('courses.course_id'))
     faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.faculty_id'))
     schedule_time: Mapped[Time] = mapped_column(Time, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     course: Mapped['Course'] = relationship(back_populates='classrooms')
     faculty: Mapped['Faculty'] = relationship(back_populates='classrooms')

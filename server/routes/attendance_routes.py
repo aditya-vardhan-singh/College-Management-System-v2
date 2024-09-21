@@ -3,7 +3,7 @@ from sqlalchemy import and_
 from flask import Blueprint, request, jsonify
 from routes.utils import department_to_json
 from schema.utils import Session
-from schema.college_models import Attendance
+from schema.college_models import Attendance, Enrollment
 
 bp = Blueprint('attendances', __name__, url_prefix='/attendances')
 
@@ -22,15 +22,13 @@ def get_attendances():
                     attendances_list = [
                         {
                             "id": attendance.attendance_id,
-                            "student":
-                                {
-                                    "id": attendance.student.student_id,
-                                    "first_name": attendance.student.first_name,
-                                    "last_name": attendance.student.last_name,
-                                    "department": attendance.student.department,
-                                    "department_id": attendance.student.department_id
-                                },
-                            "course": attendance.course,
+                            "student_id": attendance.student.student_id,
+                            "first_name": attendance.student.first_name,
+                            "last_name": attendance.student.last_name,
+                            "department": attendance.student.department.department_name,
+                            "department_id": attendance.student.department_id,
+                            "course": attendance.course.course_name,
+                            "course_id": attendance.course_id,
                             "attendance_date": attendance.attendance_date,
                             "status": attendance.status
                         }
@@ -68,15 +66,27 @@ def add_attendance():
 
         with Session() as session:
             try:
-                for student in students_list:
-                    is_duplicate = session.query(Attendance).filter(and_(Attendance.student_id == student.id, Attendance.attendance_date == attendance_date)).first()
+                # If all students are selected, update students_list
+                if students_list == ['a','l','l']:
+                    students_list = []
+                    enrollment_obj = session.query(Enrollment).all()
+                    for enrollment in enrollment_obj:
+                        students_list.append(enrollment.student_id)
 
-                    if not is_duplicate:
+                for student in students_list:
+                    is_duplicate = session.query(Attendance).filter(and_(
+                        Attendance.student_id == student,
+                        Attendance.attendance_date == attendance_date,
+                        Attendance.course_id == course_id
+                    )).first()
+
+                    if is_duplicate is None:
+                        print("True for ", student)
                         attd = Attendance(
-                            student_id=student['id'],
+                            student_id=student,
                             course_id=course_id,
                             attendance_date=attendance_date,
-                            status=student['status']
+                            status='Present'
                         )
                         session.add(attd)
 

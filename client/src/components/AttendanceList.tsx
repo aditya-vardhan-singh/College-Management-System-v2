@@ -7,8 +7,7 @@ import {
   TableRow,
   TableCell,
   getKeyValue,
-  Radio,
-  RadioGroup,
+  Selection,
 } from "@nextui-org/react";
 import axios, { isAxiosError } from "axios";
 import { Toaster, toast } from "sonner";
@@ -31,15 +30,13 @@ const columns = [
 ];
 
 export default function AttendanceList({
-  department_id,
   course_id,
   sendStudentListToParent,
 }: {
-  department_id: string;
   course_id: string;
   sendStudentListToParent: (selectedStudents: string[]) => void;
 }) {
-  const [selectedKeys, setSelectedKeys] = React.useState(new Set(["2"]));
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [studentList, setStudentList] = useState<StudentListType[]>([
     {
       id: "",
@@ -80,7 +77,7 @@ export default function AttendanceList({
   }, [course_id]);
 
   useEffect(() => {
-    sendStudentListToParent([...selectedKeys]);
+    sendStudentListToParent([...selectedKeys] as string[]);
   }, [selectedKeys, sendStudentListToParent]);
 
   return (

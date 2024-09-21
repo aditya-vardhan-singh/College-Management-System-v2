@@ -16,13 +16,7 @@ import axios, { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { baseUrl, findAge } from "../data/utils";
-import {
-  StudentType,
-  Department,
-  NullFunction,
-  CourseType,
-  Key,
-} from "../TypeHints";
+import { StudentType, NullFunction, CourseType, Key } from "../TypeHints";
 
 interface StudentFormProps {
   isOpen: NullFunction;
@@ -67,9 +61,9 @@ export default function AddStudentForm({
       label: "",
     },
   ]);
-  const [selectedDepartment, setSelectedDepartment] = useState<Selection>(
-    new Set([""]),
-  );
+  // const [selectedDepartment, setSelectedDepartment] = useState<Selection>(
+  //   new Set([""]),
+  // );
 
   // Course list
   const [courses, setCourses] = useState<{ key: string; label: string }[]>([
@@ -78,9 +72,9 @@ export default function AddStudentForm({
       label: "",
     },
   ]);
-  const [selectedCourses, setSelectedCourses] = useState<Selection>(
-    new Set([""]),
-  );
+  // const [selectedCourses, setSelectedCourses] = useState<Selection>(
+  //   new Set([""]),
+  // );
 
   const fetchDepartments = async () => {
     try {

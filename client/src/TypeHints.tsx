@@ -68,3 +68,26 @@ export interface Key {
   key: string;
   label: string;
 }
+
+export interface AttendaceListType {
+  id: string;
+  student_id: string;
+  first_name: string;
+  last_name: string;
+  department: string;
+  department_id: string;
+  course: string;
+  course_id: string;
+  attendance_date: string;
+  status: string;
+}
+
+export interface ClassType {
+  id: string;
+  room_number: string;
+  course_id: string;
+  course: string;
+  faculty_id: string;
+  faculty: string;
+  schedule_time: string;
+}

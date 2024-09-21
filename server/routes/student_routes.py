@@ -67,7 +67,6 @@ def add_student():
             return jsonify({"message": "Invalid parameters"}), 400
 
         student = data['student']
-        print(student)
 
         with Session() as session:
             try:
