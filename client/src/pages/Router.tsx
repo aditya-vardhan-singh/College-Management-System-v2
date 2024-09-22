@@ -8,6 +8,7 @@ import {
   Course,
   Result,
   Attendance,
+  Department,
 } from "./AllPages.tsx";
 
 export default function Router({
@@ -42,6 +43,10 @@ export default function Router({
       <Route
         path="/attendance"
         element={<Attendance setCurrentPage={setCurrentPage} />}
+      />
+      <Route
+        path="/department"
+        element={<Department setCurrentPage={setCurrentPage} />}
       />
     </Routes>
   );

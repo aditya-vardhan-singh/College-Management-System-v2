@@ -22,8 +22,9 @@ export default function NavigationBar({
     { name: "Class", href: "/class" },
     { name: "Student", href: "/student" },
     { name: "Faculty", href: "/faculty" },
-    { name: "Exam", href: "/exam" },
     { name: "Course", href: "/course" },
+    { name: "Department", href: "/department" },
+    { name: "Exam", href: "/exam" },
     { name: "Result", href: "/result" },
     { name: "Attendance", href: "/attendance" },
   ];

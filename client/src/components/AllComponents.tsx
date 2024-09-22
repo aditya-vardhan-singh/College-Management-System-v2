@@ -18,6 +18,9 @@ import UpdateAttendanceForm from "./UpdateAttendanceForm";
 import AddClassroomForm from "./AddClassroomForm";
 import UpdateCourseForm from "./UpdateCourseForm";
 import AttendanceList from "./AttendanceList";
+import DepartmentTable from "./DepartmentTable";
+import AddDepartmentForm from "./AddDepartmentForm";
+import UpdateDepartmentForm from "./UpdateDepartmentForm";
 
 export {
   NavigationBar,
@@ -40,4 +43,7 @@ export {
   AddClassroomForm,
   UpdateCourseForm,
   AttendanceList,
+  DepartmentTable,
+  AddDepartmentForm,
+  UpdateDepartmentForm,
 };

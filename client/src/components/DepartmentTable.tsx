@@ -1,5 +1,6 @@
 import {
   Button,
+  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -27,17 +28,15 @@ import { SearchIcon } from "../assets/SearchIcon";
 import { VerticalDotsIcon } from "../assets/VerticalDotsIcon";
 import axios from "axios";
 import { baseUrl, capitalize } from "../data/utils";
-import { AddClassroomForm } from "./AllComponents";
+import { AddDepartmentForm, UpdateDepartmentForm } from "./AllComponents";
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "ROOM NUMBER", uid: "room_number", sortable: true },
-  { name: "COURSE ID", uid: "course_id", sortable: true },
-  { name: "COURSE", uid: "course", sortable: true },
-  { name: "FACULTY ID", uid: "faculty_id", sortable: true },
-  { name: "FACULTY", uid: "faculty", sortable: true },
-  { name: "SCHEDULE TIME", uid: "schedule_time", sortable: true },
-  // { name: "ACTIONS", uid: "actions", sortable: true },
+  { name: "DEPARTMENT NAME", uid: "department_name", sortable: true },
+  { name: "NUMBER OF STUDENTS", uid: "number_of_students", sortable: true },
+  { name: "NUMBER OF FACULTIES", uid: "number_of_faculties", sortable: true },
+  { name: "NUMBER OF COURSES", uid: "number_of_courses", sortable: true },
+  { name: "ACTIONS", uid: "actions" },
 ];
 
 // const statusOptions = [
@@ -54,22 +53,31 @@ const columns = [
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
-  "room_number",
-  "course",
-  "faculty",
-  "schedule_time",
-  // "actions",
+  "department_name",
+  "number_of_students",
+  "number_of_faculties",
+  "number_of_courses",
+  "actions",
 ];
 
-export default function ClassTable() {
-  const [users, setUsers] = useState([]);
+export default function DepartmentTable() {
+  // All students
+  const [users, setUsers] = React.useState([
+    {
+      id: "",
+      department_name: "",
+      number_of_students: "",
+      number_of_faculties: "",
+      number_of_courses: "",
+    },
+  ]);
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS),
   );
   const [statusFilter, setStatusFilter] = React.useState("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: "id",
     direction: "ascending",
@@ -91,9 +99,7 @@ export default function ClassTable() {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        (user.room_number + user.course + user.faculty + user.schedule_time)
-          .toLowerCase()
-          .includes(filterValue.toLowerCase()),
+        user.department_name.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     // if (
@@ -182,14 +188,6 @@ export default function ClassTable() {
               <DropdownMenu>
                 <DropdownItem
                   onClick={() => {
-                    setCurrentOption("View");
-                    onOpen();
-                  }}
-                >
-                  View
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => {
                     setCurrentOption("Edit");
                     onOpen();
                   }}
@@ -251,7 +249,7 @@ export default function ClassTable() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            style={{ borderWidth: 0, boxShadow: "none" }}
+            // style={{ borderWidth: 0, boxShadow: "none" }}
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
@@ -259,30 +257,6 @@ export default function ClassTable() {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            {/* <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
-                >
-                  Status
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={statusFilter}
-                selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
-              >
-                {statusOptions.map((status) => (
-                  <DropdownItem key={status.uid} className="capitalize">
-                    {capitalize(status.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown> */}
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -354,9 +328,11 @@ export default function ClassTable() {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
+          {/* {selectedKeys === "all"
             ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+            : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
+          {filteredItems.length !== users.length &&
+            `After search and filter ${filteredItems.length} students in total.`}
         </span>
         <Pagination
           isCompact
@@ -387,9 +363,39 @@ export default function ClassTable() {
         </div>
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+  }, [
+    selectedKeys,
+    items.length,
+    page,
+    pages,
+    hasSearchFilter,
+    // filteredItems.length,
+    // onNextPage,
+    // onPreviousPage,
+    // users.length,
+  ]);
 
-  const StudentModal = ({ isOpen, onClose }) => {
+  const handleDeleteUser = () => {
+    async function deleteUser() {
+      await axios
+        .delete(`${baseUrl}/departments/delete`, {
+          params: { id: currentUser.id },
+        })
+        .then((response) => {
+          toast.success(
+            response?.data?.message || "Department deleted successfully",
+          );
+        })
+        .catch((err) => {
+          toast.error(
+            err?.response?.data?.message || "Unable to delete department",
+          );
+        });
+    }
+    deleteUser();
+  };
+
+  const DepartmentModal = ({ isOpen, onClose }) => {
     return (
       <>
         {currentOption === "View" && (
@@ -403,36 +409,22 @@ export default function ClassTable() {
               {(onClose) => (
                 <>
                   <ModalHeader className="flex flex-col gap-1">
-                    {`${currentUser.first_name} ${currentUser.last_name}`}
+                    Department Details
                   </ModalHeader>
                   <ModalBody>
-                    <p>
-                      ID: {currentUser.id}
-                      <br />
-                      AGE: {currentUser.age}
-                      <br />
-                      GENDER: {currentUser.gender}
-                      <br />
-                      EMAIL: {currentUser.email}
-                      <br />
-                      PHONE: {currentUser.phone}
-                      <br />
-                      ADDRESS: {currentUser.address}
-                      <br />
-                      DEPARTMENT ID: {currentUser.department_id}
-                      <br />
-                      ENROLLMENT DATE: {currentUser.enrollment_date}
-                      <br />
-                      STATUS: {currentUser.status}
-                    </p>
+                    <div className="grid grid-cols-6 gap-4">
+                      <Input
+                        isReadOnly
+                        label="Name"
+                        defaultValue={currentUser.department_name}
+                        className="col-span-6"
+                      />
+                    </div>
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button color="default" onPress={onClose}>
                       Close
                     </Button>
-                    {/* <Button color="primary" onPress={onClose}>
-                      Action
-                    </Button> */}
                   </ModalFooter>
                 </>
               )}
@@ -447,59 +439,64 @@ export default function ClassTable() {
             size="2xl"
           >
             <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Confirmation
-                  </ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Are you sure you want to remove{" "}
-                      {`${currentUser.first_name} ${currentUser.last_name}`}
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                      Delete
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
+              {(onClose) => {
+                return currentUser.status === "left" ? (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Alert
+                    </ModalHeader>
+                    <ModalBody>
+                      <p>
+                        {`'${currentUser.department_name}' has already been deleted!`}
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="default" onPress={onClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </>
+                ) : (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Confirmation
+                    </ModalHeader>
+                    <ModalBody>
+                      <p>
+                        Are you sure you want to remove{" "}
+                        {`'${currentUser.department_name}'`}
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="danger" variant="light" onPress={onClose}>
+                        Close
+                      </Button>
+                      <Button
+                        color="primary"
+                        onClick={() => {
+                          handleDeleteUser();
+                          onClose();
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </ModalFooter>
+                  </>
+                );
+              }}
             </ModalContent>
           </Modal>
         )}
         {currentOption === "Edit" && (
-          <Modal
+          <UpdateDepartmentForm
+            currentDepartmentDetails={currentUser}
             isOpen={isOpen}
+            onClose={onClose}
             onOpenChange={onOpenChange}
-            backdrop="blur"
-            size="5xl"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Edit Student
-                  </ModalHeader>
-                  <ModalBody>{/* <StudentForm /> */}</ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                      Update
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
+          />
         )}
         {currentOption === "Add" && (
-          <AddClassroomForm
+          <AddDepartmentForm
             isOpen={isOpen}
             onClose={onClose}
             onOpenChange={onOpenChange}
@@ -511,16 +508,19 @@ export default function ClassTable() {
 
   useEffect(() => {
     axios
-      .get(`${baseUrl}/classes/all`)
+      .get(`${baseUrl}/departments/list`)
       .then((response) => {
-        if (response?.data?.classrooms) {
-          setUsers(response.data.classrooms);
+        if (response?.data?.departments) {
+          setUsers(response.data.departments);
         } else {
           toast.error("Invalid response parameters!");
         }
       })
       .catch((err) => {
-        toast.error(err?.message || "Error getting classroom records!");
+        console.log(err);
+        toast.error(
+          err?.response?.data?.message || "Error getting student records!",
+        );
       });
   }, []);
 
@@ -554,7 +554,7 @@ export default function ClassTable() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No records found"} items={sortedItems}>
+        <TableBody emptyContent={"No users found"} items={sortedItems}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
@@ -564,7 +564,7 @@ export default function ClassTable() {
           )}
         </TableBody>
       </Table>
-      <StudentModal
+      <DepartmentModal
         isOpen={isOpen}
         onClose={onOpenChange}
         user={currentUser}
