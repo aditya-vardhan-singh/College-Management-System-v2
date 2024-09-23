@@ -182,7 +182,10 @@ export default function AddAttendanceForm({
                   onChange={(e) => handleDepartmentChange(e.target.value)}
                 >
                   {departments.map((department) => (
-                    <SelectItem key={department.key} value={department.key}>
+                    <SelectItem
+                      key={department.key}
+                      textValue={department.label}
+                    >
                       {department.label}
                     </SelectItem>
                   ))}

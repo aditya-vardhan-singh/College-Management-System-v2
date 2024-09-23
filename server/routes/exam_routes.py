@@ -1,3 +1,4 @@
+from sqlalchemy.sql import and_
 from flask import Blueprint, request, jsonify
 from schema.utils import Session
 from schema.college_models import Exam
@@ -12,23 +13,25 @@ def get_exams():
         try:
             exams = session.query(Exam).limit(100).all()
             if exams is None:
-                return jsonify({"message": "No records found"}), 400
+                print("No record found")
+                return jsonify({"exams": []}), 200
             else:
                 exams_list = [
                     {
                         "id": exam.exam_id,
                         "course_id": exam.course_id,
-                        "course": exam.course,
+                        "course": exam.course.course_name,
                         "exam_date": exam.exam_date,
                         "exam_type": exam.exam_type,
                         "max_marks": exam.max_marks
                     }
-                    for exam in exams if exam.is_active == True
+                    for exam in exams if exam.is_active
                 ]
-                return jsonify({"users": exams_list}), 200
+                return jsonify({"exams": exams_list}), 200
         except Exception as e:
             session.rollback()
-            return jsonify({"message": "Error getting exams records", "error": str(e)}), 500
+            print("Error getting exam records: ", str(e))
+            return jsonify({"message": "Error getting exam records"}), 500
         finally:
             session.close()
 
@@ -38,24 +41,38 @@ def add_exams():
     if request.method == 'POST':
         data = request.get_json()
         if 'exam' not in data:
+            print("Invalid parameters request")
             return jsonify({"message": "Invalid parameters"}), 400
 
         exam = data['exam']
 
         with Session() as session:
-            exam_obj = Exam(
-                course_id=exam['course_id'],
-                exam_date=exam['exam_date'],
-                exam_type=exam['exam_type'],
-                max_marks=exam['max_marks']
-            )
-            try:
-                session.add(exam_obj)
-                session.commit()
-                return jsonify({"message": "Exam uploaded successfully"}), 200
-            except Exception as e:
-                session.rollback()
-                return jsonify({"message": "Failed to upload exam", "error": str(e)}), 500
+            is_duplicate = session.query(Exam).filter(and_(
+                Exam.course_id == exam['course_id'],
+                Exam.exam_date == exam['exam_date'],
+                Exam.exam_type == exam['exam_type']
+            )).first()
+
+            if is_duplicate is None:
+                print("Exam date: ", exam['exam_date'])
+                exam_obj = Exam(
+                    course_id=exam['course_id'],
+                    exam_date=exam['exam_date'],
+                    exam_type=exam['exam_type'],
+                    max_marks=exam['max_marks']
+                )
+                try:
+                    session.add(exam_obj)
+                    session.commit()
+                    return jsonify({"message": "Exam uploaded successfully"}), 200
+
+                except Exception as e:
+                    session.rollback()
+                    print("Error occured while uploading exam details:", str(e))
+                    return jsonify({"message": "Failed to upload exam"}), 500
+            else:
+                print("Exam details already exists")
+                return jsonify({"message": "Exam details already exists"}), 400
 
 
 @bp.route('/update', methods=['PUT'])

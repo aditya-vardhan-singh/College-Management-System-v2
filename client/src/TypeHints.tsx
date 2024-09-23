@@ -91,3 +91,12 @@ export interface ClassType {
   faculty: string;
   schedule_time: string;
 }
+
+export interface ExamType {
+  id: string; //
+  course_id: string; //
+  course: string;
+  exam_date: string;
+  exam_type: string; //
+  max_marks: string; //
+}
