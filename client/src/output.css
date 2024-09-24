@@ -1330,18 +1330,6 @@ video {
   max-height: calc(100% - 8rem);
 }
 
-.max-h-\[90vh\] {
-  max-height: 90vh;
-}
-
-.max-h-\[80vh\] {
-  max-height: 80vh;
-}
-
-.max-h-\[600px\] {
-  max-height: 600px;
-}
-
 .min-h-10 {
   min-height: 2.5rem;
 }
@@ -2035,6 +2023,10 @@ video {
 
 .grid-flow-col {
   grid-auto-flow: column;
+}
+
+.grid-cols-12 {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 .grid-cols-4 {
@@ -6480,11 +6472,6 @@ video {
   background-color: hsl(var(--nextui-warning-50) / var(--nextui-warning-50-opacity, var(--tw-bg-opacity)));
 }
 
-.focus-within\:bg-default-50:focus-within {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--nextui-default-50) / var(--nextui-default-50-opacity, var(--tw-bg-opacity)));
-}
-
 .focus-within\:after\:w-full:focus-within::after {
   content: var(--tw-content);
   width: 100%;
@@ -6891,21 +6878,6 @@ video {
 
 .focus\:bg-warning-400\/50:focus {
   background-color: hsl(var(--nextui-warning-400) / 0.5);
-}
-
-.focus\:bg-white:focus {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-}
-
-.focus\:bg-primary-50:focus {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--nextui-primary-50) / var(--nextui-primary-50-opacity, var(--tw-bg-opacity)));
-}
-
-.focus\:bg-gray-200:focus {
-  --tw-bg-opacity: 1;
-  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
 }
 
 .focus\:text-cyan-700:focus {

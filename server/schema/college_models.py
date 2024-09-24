@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, Date, Text, ForeignKey, CheckConstraint, Time
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql.sqltypes import Boolean
@@ -130,6 +130,7 @@ class Exam(Base):
     exam_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     course_id: Mapped[int] = mapped_column(ForeignKey('courses.course_id'))
     exam_date: Mapped[str] = mapped_column(String(15), nullable=False)
+    # exam_time: Mapped[datetime.time] = mapped_column(Time, nullable=False)
     exam_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'Midterm', 'Final', etc.
     max_marks: Mapped[int] = mapped_column(Integer, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
@@ -147,6 +148,7 @@ class Result(Base):
     exam_id: Mapped[int] = mapped_column(ForeignKey('exams.exam_id'))
     course_id: Mapped[int] = mapped_column(ForeignKey('courses.course_id'))
     marks_obtained: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     student: Mapped['Student'] = relationship(back_populates='results')
     exam: Mapped['Exam'] = relationship(back_populates='results')

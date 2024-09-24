@@ -100,3 +100,15 @@ export interface ExamType {
   exam_type: string; //
   max_marks: string; //
 }
+
+export interface ResultType {
+  id: string;
+  student_id: string;
+  student_first_name: string;
+  student_last_name: string;
+  exam_id: string;
+  exam_date: string;
+  course_id: string;
+  course_name: string;
+  marks_obtained: string;
+}

@@ -1,13 +1,16 @@
 from sqlalchemy.sql import and_
 from flask import Blueprint, request, jsonify
 from schema.utils import Session
-from schema.college_models import Exam
+from schema.college_models import Result, Exam
 
 bp = Blueprint('exams', __name__, url_prefix='/exams')
 
 
+'''APIs to handle exam related requests'''
+
 @bp.route('/all', methods=['GET'])
 def get_exams():
+    '''Function to return a json format exam' list'''
     if request.method == 'GET':
         session = Session()
         try:
@@ -16,18 +19,18 @@ def get_exams():
                 print("No record found")
                 return jsonify({"exams": []}), 200
             else:
-                exams_list = [
+                exam_list = [
                     {
                         "id": exam.exam_id,
                         "course_id": exam.course_id,
                         "course": exam.course.course_name,
                         "exam_date": exam.exam_date,
                         "exam_type": exam.exam_type,
-                        "max_marks": exam.max_marks
+                        "max_marks": exam.max_marks,
                     }
                     for exam in exams if exam.is_active
                 ]
-                return jsonify({"exams": exams_list}), 200
+                return jsonify({"exams": exam_list}), 200
         except Exception as e:
             session.rollback()
             print("Error getting exam records: ", str(e))

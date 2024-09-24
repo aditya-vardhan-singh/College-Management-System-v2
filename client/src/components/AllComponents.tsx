@@ -22,6 +22,7 @@ import DepartmentTable from "./DepartmentTable";
 import AddDepartmentForm from "./AddDepartmentForm";
 import UpdateDepartmentForm from "./UpdateDepartmentForm";
 import AddExamForm from "./AddExamForm";
+import AddResultForm from "./AddResultForm";
 
 export {
   NavigationBar,
@@ -48,4 +49,5 @@ export {
   AddDepartmentForm,
   UpdateDepartmentForm,
   AddExamForm,
+  AddResultForm,
 };
