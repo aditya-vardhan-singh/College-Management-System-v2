@@ -81,7 +81,6 @@ def add_attendance():
                     )).first()
 
                     if is_duplicate is None:
-                        print("True for ", student)
                         attd = Attendance(
                             student_id=student,
                             course_id=course_id,

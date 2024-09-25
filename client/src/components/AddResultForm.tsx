@@ -8,15 +8,12 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Select,
-  SelectItem,
 } from "@nextui-org/react";
 import axios, { isAxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Toaster, toast } from "sonner";
 import { baseUrl } from "../data/utils";
-import { ResultType, NullFunction, CourseType, Key } from "../TypeHints";
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { ResultType, NullFunction } from "../TypeHints";
 
 interface ExamFormProps {
   isOpen: NullFunction;
