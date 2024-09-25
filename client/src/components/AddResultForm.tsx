@@ -41,7 +41,7 @@ export default function AddResultForm({
     marks_obtained: "",
   });
 
-  const handleAddExamSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddResultSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // API call to store result to database
@@ -74,7 +74,7 @@ export default function AddResultForm({
       >
         <ModalContent>
           {(onClose) => (
-            <form onSubmit={handleAddExamSubmit}>
+            <form onSubmit={handleAddResultSubmit}>
               <ModalHeader className="flex flex-col gap-1">
                 New Result
               </ModalHeader>
