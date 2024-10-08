@@ -1,0 +1,117 @@
+openapi: 3.0.0
+
+info:
+  title: Student Management API
+  version: 0.1.0
+  description: API for managing student data, including retrieving, adding, updating, and deleting student records.
+
+server:
+  - url: http://127.0.0.1:5000/students
+    description: Local development server (uses local data)
+
+paths:
+  /all:
+    get:
+      summary: Retrieve all students
+      responses:
+        "200":
+          description: List of students retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                        age:
+                          type: integer
+                        date_of_birth:
+                          type: string
+                          format: date
+                        gender:
+                          type: string
+                        email:
+                          type: string
+                        phone:
+                          type: string
+                        address:
+                          type: string
+                        department_id:
+                          type: string
+                        enrollment_date:
+                          type: string
+                          format: date
+                        status:
+                          type: string
+        "400":
+          description: No records found
+        "500":
+          description: Error retrieving student records
+
+  /add:
+    post:
+      summary: Add a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student:
+                  type: object
+                  required:
+                    - first_name
+                    - last_name
+                    - gender
+                    - email
+                    - phone
+                    - date_of_birth
+                    - address
+                    - department_id
+                    - enrollment_date
+                    - status
+                    - courses_id
+                  properties:
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                    gender:
+                      type: string
+                    email:
+                      type: string
+                    phone:
+                      type: string
+                    date_of_birth:
+                      type: string
+                      format: date
+                    address:
+                      type: string
+                    department_id:
+                      type: integer
+                    enrollment_date:
+                      type: string
+                      format: date
+                    status:
+                      type: string
+                    courses_id:
+                      type: array
+                      items:
+                        type: integer
+      responses:
+        "200":
+          description: Student added successfully
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Failed to add student
