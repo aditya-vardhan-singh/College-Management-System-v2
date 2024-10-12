@@ -2,11 +2,19 @@
 
 from flask import Flask
 from flask_cors import CORS
+from flasgger import Swagger
 
 
 ### APP | CORS SETUP ###
 
 app = Flask(__name__)
+swagger = Swagger(app, template={
+    "info": {
+        "title": "College Management System",
+        "description": "APIs to handle college management system.",
+        "version": "0.1.0"
+    }
+})
 CORS(app)
 
 

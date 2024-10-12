@@ -37,14 +37,14 @@ export default function AddStudentForm({
     gender: "",
     email: "",
     phone: "",
-    age: "",
+    age: "", // not directly in db
     date_of_birth: "",
     address: "",
     department_id: "",
-    department: "",
+    department: "", // not directly in db
     enrollment_date: "",
     status: "admitted",
-    courses: [],
+    courses: [], // not directly in db
     courses_id: [],
   });
 

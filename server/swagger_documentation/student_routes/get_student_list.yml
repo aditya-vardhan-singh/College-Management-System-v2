@@ -1,0 +1,91 @@
+Get student list
+---
+tags:
+  - Students
+summary: Retrieve a list of students
+description: Get a list of up to 100 students with their details including calculated age and department name.
+operationId: get_student_list
+responses:
+  200:
+    description: Successful operation
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Success
+        error:
+          type: string
+          example: ''
+        student_list:
+          type: array
+          items:
+            type: object
+            properties:
+              student_id:
+                type: integer
+                example: 1
+              first_name:
+                type: string
+                example: John
+              last_name:
+                type: string
+                example: Doe
+              age:
+                type: integer
+                example: 20
+              date_of_birth:
+                type: string
+                format: date
+                example: '2003-05-15'
+              gender:
+                type: string
+                example: Male
+              email:
+                type: string
+                example: john.doe@example.com
+              phone:
+                type: string
+                example: '+1234567890'
+              address:
+                type: string
+                example: '123 Main St, Anytown, USA'
+              department_id:
+                type: integer
+                example: 1
+              department_name:
+                type: string
+                example: Computer Science
+              enrollment_date:
+                type: string
+                format: date
+                example: '2021-09-01'
+              status:
+                type: string
+                example: Active
+  400:
+    description: Invalid parameters
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Invalid parameters
+        error:
+          type: string
+        student_list:
+          type: array
+          items: {}
+  500:
+    description: Internal server error
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Failed to get student list
+        error:
+          type: string
+        student_list:
+          type: array
+          items: {}

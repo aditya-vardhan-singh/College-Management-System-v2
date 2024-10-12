@@ -31,7 +31,7 @@ import { baseUrl, capitalize } from "../data/utils";
 import { AddStudentForm, UpdateStudentForm } from "./AllComponents";
 
 const columns = [
-  { name: "ID", uid: "id", sortable: true },
+  { name: "STUDENT ID", uid: "student_id", sortable: true },
   { name: "FIRST NAME", uid: "first_name", sortable: true },
   { name: "LAST NAME", uid: "last_name", sortable: true },
   { name: "AGE", uid: "age", sortable: true },
@@ -40,7 +40,7 @@ const columns = [
   { name: "EMAIL", uid: "email" },
   { name: "PHONE", uid: "phone" },
   { name: "ADDRESS", uid: "address" },
-  { name: "DEPARTMENT", uid: "department", sortable: true },
+  { name: "DEPARTMENT", uid: "department_name", sortable: true },
   { name: "ENROLLMENT DATE", uid: "enrollment_date", sortable: true },
   { name: "STATUS", uid: "status", sortable: true },
   { name: "ACTIONS", uid: "actions" },
@@ -59,7 +59,7 @@ const statusColorMap = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
+  "student_id",
   "first_name",
   "last_name",
   "age",
@@ -72,21 +72,21 @@ const INITIAL_VISIBLE_COLUMNS = [
 export default function StudentTable() {
   // All students
   const [users, setUsers] = React.useState([
-    {
-      id: "",
-      first_name: "",
-      last_name: "",
-      age: "",
-      date_of_birth: "",
-      gender: "",
-      email: "",
-      phone: "",
-      address: "",
-      department_id: "",
-      department: "",
-      enrollment_date: "",
-      status: "",
-    },
+    // {
+    //   student_id: "",
+    //   first_name: "",
+    //   last_name: "",
+    //   age: "",
+    //   date_of_birth: "",
+    //   gender: "",
+    //   email: "",
+    //   phone: "",
+    //   address: "",
+    //   department_id: "",
+    //   department_name: "",
+    //   enrollment_date: "",
+    //   status: "",
+    // },
   ]);
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
@@ -96,7 +96,7 @@ export default function StudentTable() {
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "id",
+    column: "student_id",
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
@@ -430,7 +430,7 @@ export default function StudentTable() {
     async function deleteUser() {
       await axios
         .delete(`${baseUrl}/students/delete`, {
-          params: { id: currentUser.id },
+          params: { student_id: currentUser.student_id },
         })
         .then((response) => {
           toast.success(
@@ -507,13 +507,13 @@ export default function StudentTable() {
                       <Input
                         isReadOnly
                         label="Student ID"
-                        defaultValue={currentUser.id}
+                        defaultValue={currentUser.student_id}
                         className="col-span-2"
                       />
                       <Input
                         isReadOnly
                         label="Department"
-                        defaultValue={currentUser.department}
+                        defaultValue={currentUser.department_name}
                         className="col-span-4"
                       />
                       <Input
@@ -622,8 +622,8 @@ export default function StudentTable() {
     axios
       .get(`${baseUrl}/students/all`)
       .then((response) => {
-        if (response?.data?.users) {
-          setUsers(response.data.users);
+        if (response?.data?.student_list) {
+          setUsers(response.data.student_list);
         } else {
           toast.error("Invalid response parameters!");
         }
@@ -666,9 +666,9 @@ export default function StudentTable() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No users found"} items={sortedItems}>
+        <TableBody emptyContent={"No student found"} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.id}>
+            <TableRow key={item.student_id}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}

@@ -20,7 +20,6 @@ class Student(Base):
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.department_id'))
     enrollment_date: Mapped[str] = mapped_column(String(15), nullable=False)
     status: Mapped[str] = mapped_column(String(10), nullable=False)
-    # deleted: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     department: Mapped['Department'] = relationship(back_populates='students')
     enrollments: Mapped[list['Enrollment']] = relationship(back_populates='student')
