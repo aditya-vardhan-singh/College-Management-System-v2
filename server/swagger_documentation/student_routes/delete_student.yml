@@ -1,0 +1,67 @@
+Soft delete an existing student
+---
+tags:
+  - Students
+summary: Soft delete (turn status inactive) an existing student. The details still remain in the database but cannot be requested from client side.
+description: Soft delete (turn status inactive) an existing student. The details still remain in the database but cannot be requested from client side.
+operationId: delete_student
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - in: body
+    name: id
+    description: ID of the student that needs to be deleted
+    requested: true
+    schema:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+responses:
+  200:
+    description: Student deleted successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Student deleted successfully
+        error:
+          type: string
+          example: ""
+  400:
+    description: Invalid parameters
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Invalid parameters
+        error:
+          type: string
+          example: Invalid parameters request
+  404:
+    description: Student not found
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Student not found
+        error:
+          type: string
+          example: Student not found in records
+  500:
+    description: Failed to delete student
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Failed to delete student
+        error:
+          type: string
+          example: Error details

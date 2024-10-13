@@ -4,14 +4,14 @@ tags:
   - Students
 summary: Add a new student
 description: Add a new student to the database along with their course enrollments
-operationId: addStudent
+operationId: add_student
 consumes:
   - application/json
 produces:
   - application/json
 parameters:
   - in: body
-    name: body
+    name: student
     description: Student object that needs to be added
     required: true
     schema:

@@ -84,7 +84,7 @@ def get_student_list():
                         "error": "",
                         "student_list": []
                     }), 200 # No record found
-                
+
                 student_list = []
                 for student in students:
                     student_data = StudentModal.from_orm(student)
@@ -126,7 +126,7 @@ def get_student_list():
 @bp.route('/v2/add', methods=['POST'])
 @validate()
 @swag_from('../swagger_documentation/student_routes/add_student.yml')
-def add_student(body: StudentRequestModal):
+def add_student_v2(body: StudentRequestModal):
     if request.method == 'POST':
         student_data = body.student.dict()
         course_id = student_data.pop('course_id')
@@ -146,13 +146,13 @@ def add_student(body: StudentRequestModal):
                         enrollment_date=student_data['enrollment_data']
                     )
                     session.add(enrollment_obj)
-                
+
                 session.commit()
                 return ResponseModal(
                     message="Student added successfully",
                     error=""
                 ), 200 # OK
-            
+
             except ValidationError as e:
                 session.rollback()
                 print("Invalid parameter request")
@@ -168,10 +168,10 @@ def add_student(body: StudentRequestModal):
                     message="Failed to add student",
                     error=str(e)
                 ), 500 # Internal server error
-        
+
 
 @bp.route('/add', methods=['POST'])
-def add_student_v1():
+def add_student():
     if request.method == 'POST':
         data = request.get_json()
         if 'student' not in data:
@@ -204,6 +204,7 @@ def add_student_v1():
 
 
 @bp.route('/update', methods=['PUT'])
+@swag_from('../swagger_documentation/student_routes/update_student.yml')
 def update_student():
     if request.method == 'PUT':
         data = request.get_json()
@@ -230,17 +231,18 @@ def update_student():
                     session.commit()
                     return jsonify({"message": "Student details updated successfully"}), 200
                 else:
-                    return jsonify({"message": "Student not found"}), 400
+                    return jsonify({"message": "Student not found"}), 404
             except Exception as e:
                 session.rollback()
                 return jsonify({"message": "Failed to update student"}), 500
 
 
 @bp.route('/delete', methods=['DELETE'])
+@swag_from('../swagger_documentation/student_routes/delete_student.yml')
 def delete_student():
     if request.method == 'DELETE':
         if 'id' not in request.args:
-            return jsonify({"message": "Invalid parameter request"}), 400
+            return jsonify({"message": "Invalid parameters", "error": "Invalid parameter request"}), 400
         id = request.args.get('id')
         with Session() as session:
             try:
@@ -248,9 +250,9 @@ def delete_student():
                 if student_obj:
                     student_obj.status = 'left'
                     session.commit()
-                    return jsonify({"message": "Student deleted successfully"}), 200
+                    return jsonify({"message": "Student deleted successfully", "error": ""}), 200
                 else:
-                    return jsonify({"message": "Student not found in records"}), 400
+                    return jsonify({"message": "Student not found", "error": "Student not found in records"}), 404
             except Exception as e:
                 session.rollback()
-                return jsonify({"message": "Failed to delete student"}), 500
+                return jsonify({"message": "Failed to delete student", "error": str(e)}), 500
