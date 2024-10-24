@@ -1,0 +1,99 @@
+Add a new faculty
+---
+tags:
+  - Faculties
+summary: Add a new faculty
+description: Add a new faculty to the database
+operationId: add_faculty
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - in: body
+    name: faculty
+    description: Faculty object that needs to be added
+    required: true
+    schema:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: Chandrabhan
+        last_name:
+          type: string
+          example: Singh
+        gender:
+          type: string
+          example: Male
+        email:
+          type: string 
+          example: chandrabhan.singh@example.com
+        phone:
+          type: string
+          example: "+1234567890"
+        department_id:
+          type: integer
+          example: 1
+        hire_date:
+          type: date
+          format: date
+          example: "2000-01-01"
+        date_of_birth:
+          type: date
+          format: date
+          example: "2000-01-01"
+      required:
+        - first_name
+        - last_name
+        - gender
+        - email
+        - phone
+        - department_id
+        - hire_date
+        - date_of_birth
+responses:
+  200:
+    description: Faculty added successfully
+    schema: 
+      type: object
+      properties:
+        message: 
+          type: string
+          example: Faculty added successfully
+        error:
+          type: string
+          example: ""
+  403:
+    description: Already exists
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Already exists
+        error:
+          type: string
+          example: Faculty with same email already exists
+  422:
+    description: Invalid parameters
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Invalid parameters
+        error:
+          type: string
+          example: "'faculty' field has some parameter missing"
+  500:
+    description: Failed to add faculty
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Failed to add faculty
+        error:
+          type: string
+          example: Error details

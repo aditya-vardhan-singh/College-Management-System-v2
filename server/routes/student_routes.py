@@ -175,7 +175,7 @@ def add_student():
     if request.method == 'POST':
         data = request.get_json()
         if 'student' not in data:
-            return jsonify({"message": "Invalid parameters"}), 400
+            return jsonify({"message": "Invalid parameters"}), 403
 
         student = data['student']
 
@@ -242,7 +242,7 @@ def update_student():
 def delete_student():
     if request.method == 'DELETE':
         if 'id' not in request.args:
-            return jsonify({"message": "Invalid parameters", "error": "Invalid parameter request"}), 400
+            return jsonify({"message": "Invalid parameters", "error": "Invalid parameter request"}), 403
         id = request.args.get('id')
         with Session() as session:
             try:

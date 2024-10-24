@@ -1,10 +1,10 @@
-Soft delete an existing student
+Soft delete an existing faculty
 ---
 tags:
-  - Students
-summary: Soft delete (turn status inactive) an existing student. The details still remain in the database but cannot be requested from client side.
-description: Soft delete (turn status inactive) an existing student. The details still remain in the database but cannot be requested from client side.
-operationId: delete_student
+  - Faculties
+summary: Soft delete (turn status inactive) an existing faculty. The details still remain in the database but cannot be requested from client side.
+description: Soft delete (turn status inactive) an existing faculty. The details still remain in the database but cannot be requested from client side.
+operationId: delete_faculty
 consumes:
   - application/json
 produces:
@@ -12,25 +12,25 @@ produces:
 parameters:
   - in: arguments
     name: id
-    description: ID of the student that needs to be deleted
+    description: ID of the faculty that needs to be deleted
     required: true
     schema:
       type: object
       properties:
-        id:
+        id: 
           type: integer
           example: 1
       required:
         - id
 responses:
   200:
-    description: Student deleted successfully
+    description:
     schema:
       type: object
       properties:
-        message:
+        message: 
           type: string
-          example: Student deleted successfully
+          example: Faculty deleted successfully
         error:
           type: string
           example: ""
@@ -46,24 +46,24 @@ responses:
           type: string
           example: Invalid parameters request
   404:
-    description: Student not found
+    description: Faculty not found
     schema:
       type: object
       properties:
         message:
           type: string
-          example: Student not found
+          example: Faculty not found
         error:
           type: string
-          example: Student not found in records
+          example: Faculty not found in records
   500:
-    description: Failed to delete student
+    description: Failed to delete faculty
     schema:
       type: object
       properties:
         message:
           type: string
-          example: Failed to delete student
+          example: Failed to delete faculty
         error:
           type: string
           example: Error details

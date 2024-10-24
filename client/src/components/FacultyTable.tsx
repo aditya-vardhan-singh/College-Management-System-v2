@@ -616,8 +616,8 @@ export default function FacultyTable() {
     axios
       .get(`${baseUrl}/faculties/all`)
       .then((response) => {
-        if (response?.data?.faculties) {
-          setUsers(response.data.faculties);
+        if (response?.data?.faculty_list) {
+          setUsers(response.data.faculty_list);
         } else {
           toast.error("Invalid response parameters!");
         }

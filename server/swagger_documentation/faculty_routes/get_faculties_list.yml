@@ -1,10 +1,10 @@
-Get student list
+Get faculty list
 ---
 tags:
-  - Students
-summary: Retrieve a list of students
-description: Get a list of up to 100 students with their details including calculated age and department name.
-operationId: get_student_list
+  - Faculties
+summary: Retrieve a list of faculties
+description: Get a list of up to 100 faculties with their details including calculated age and department name.
+operationId: get_faculty_list
 responses:
   200:
     description: Successful operation
@@ -17,12 +17,12 @@ responses:
         error:
           type: string
           example: ''
-        student_list:
+        faculty_list:
           type: array
           items:
             type: object
             properties:
-              student_id:
+              id:
                 type: integer
                 example: 1
               first_name:
@@ -33,7 +33,7 @@ responses:
                 example: Doe
               age:
                 type: integer
-                example: 20
+                example: 28
               date_of_birth:
                 type: string
                 format: date
@@ -47,23 +47,20 @@ responses:
               phone:
                 type: string
                 example: '+1234567890'
-              address:
-                type: string
-                example: '123 Main St, Anytown, USA'
               department_id:
                 type: integer
                 example: 1
               department_name:
                 type: string
                 example: Computer Science
-              enrollment_date:
+              hire_date:
                 type: string
                 format: date
                 example: '2021-09-01'
               status:
                 type: string
                 example: active
-  400:
+  403:
     description: Invalid parameters
     schema:
       type: object
@@ -73,7 +70,7 @@ responses:
           example: Invalid parameters
         error:
           type: string
-        student_list:
+        faculty_list:
           type: array
           items: {}
   500:
@@ -83,9 +80,9 @@ responses:
       properties:
         message:
           type: string
-          example: Failed to get student list
+          example: Failed to get faculty list
         error:
           type: string
-        student_list:
+        faculty_list:
           type: array
           items: {}
